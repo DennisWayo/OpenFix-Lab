@@ -1,6 +1,9 @@
 let state={token:'',run:null,integrity:null,mode:'bbox',tab:'results',busy:false,execution:null,supporting:{},wizard:{intake:null,diagnosis:null,repair:null,model:'muse-spark-1.3'}};
 const $=id=>document.getElementById(id);
 let noticeTimer=null;
+let museProgressTimer=null;
+let museProgressHideTimer=null;
+let museProgressStarted=0;
 function text(id,value){$(id).textContent=value??'';}
 function notice(message,error=false){
   clearTimeout(noticeTimer);text('notice',message);$('notice').hidden=false;$('notice').classList.toggle('error',error);
@@ -29,6 +32,28 @@ function openStep(number){
   $('step-'+number).scrollIntoView({behavior:'smooth',block:'start'});
 }
 function setStepStatus(number,value,kind=''){text(`step-${number}-status`,value);$(`step-${number}-status`).className='step-state '+kind;}
+function progressTime(seconds){return `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;}
+function updateMuseClock(){text('muse-progress-time',progressTime(Math.floor((Date.now()-museProgressStarted)/1000)));}
+function setMuseProgress(stage){
+  const progress=$('muse-progress');progress.hidden=false;progress.classList.remove('error','complete');
+  const diagnosis=$('muse-stage-diagnose');const repair=$('muse-stage-repair');diagnosis.className='';repair.className='';
+  if(stage==='diagnose'){
+    diagnosis.className='active';text('muse-progress-title','Muse is diagnosing the issue');text('muse-progress-copy','Reading the pinned source and policy questions.');
+  }else if(stage==='repair'){
+    diagnosis.className='done';repair.className='active';text('muse-progress-title','Diagnosis ready. Muse is generating a patch');text('muse-progress-copy','Turning the identified contract into a focused candidate repair.');
+  }else if(stage==='complete'){
+    diagnosis.className='done';repair.className='done';progress.classList.add('complete');text('muse-progress-title','Candidate patch ready');text('muse-progress-copy','Structured output received. Preparing it for review.');
+  }
+}
+function startMuseProgress(){
+  clearInterval(museProgressTimer);clearTimeout(museProgressHideTimer);museProgressStarted=Date.now();setMuseProgress('diagnose');updateMuseClock();museProgressTimer=setInterval(updateMuseClock,1000);
+}
+function finishMuseProgress(){
+  clearInterval(museProgressTimer);updateMuseClock();setMuseProgress('complete');museProgressHideTimer=setTimeout(()=>{$('muse-progress').hidden=true;},1600);
+}
+function failMuseProgress(message){
+  clearInterval(museProgressTimer);const progress=$('muse-progress');progress.hidden=false;progress.classList.add('error');text('muse-progress-title','Muse request stopped');text('muse-progress-copy',message||'Review the message and try again.');
+}
 
 async function history(){
   const {runs}=await api('/api/runs');
@@ -141,16 +166,18 @@ const modelDescriptions={
 $('model-select').onchange=()=>{state.wizard.model=$('model-select').value;text('model-description',modelDescriptions[state.wizard.model]);};
 $('generate-candidate').onclick=()=>task('Muse is diagnosing the issue and generating a focused candidate patch…',async()=>{
   if(!state.wizard.intake)throw new Error('Complete Step 01 before asking Muse for a repair.');
-  const apiKey=$('api-key').value;const model=$('model-select').value;state.wizard.model=model;setStepStatus(2,'MUSE WORKING');
-  const diagnosis=await api('/api/model',{run_id:state.wizard.intake.id,action:'diagnose',api_key:apiKey,model});
-  if(diagnosis.run.record.status!=='proposal_ready')throw new Error('Muse diagnosis was not valid structured output. Inspect the saved evidence and try again.');
-  state.wizard.diagnosis=diagnosis.run;
-  const repair=await api('/api/model',{run_id:diagnosis.run.id,action:'repair',api_key:apiKey,model});
-  if(repair.run.record.status!=='proposal_ready')throw new Error('Muse did not return a valid candidate patch. Inspect the saved evidence and try again.');
-  state.wizard.repair=repair.run;
-  const modelName=$('model-select').selectedOptions[0].textContent.split(' · ')[0];
-  text('diagnosis-summary',`${modelName} identified a candidate contract violation.`);text('repair-summary','Structured patch ready · not executed yet');
-  text('proposal-view',repair.run.record.proposal.unified_diff);$('candidate-preview').hidden=false;setStepStatus(2,'CANDIDATE READY','complete');await history();notice('Candidate generated. Inspect the patch, then continue to the execution gate.');
+  const apiKey=$('api-key').value;const model=$('model-select').value;state.wizard.model=model;setStepStatus(2,'MUSE WORKING');startMuseProgress();
+  try{
+    const diagnosis=await api('/api/model',{run_id:state.wizard.intake.id,action:'diagnose',api_key:apiKey,model});
+    if(diagnosis.run.record.status!=='proposal_ready')throw new Error('Muse diagnosis was not valid structured output. Inspect the saved evidence and try again.');
+    state.wizard.diagnosis=diagnosis.run;setMuseProgress('repair');
+    const repair=await api('/api/model',{run_id:diagnosis.run.id,action:'repair',api_key:apiKey,model});
+    if(repair.run.record.status!=='proposal_ready')throw new Error('Muse did not return a valid candidate patch. Inspect the saved evidence and try again.');
+    state.wizard.repair=repair.run;
+    const modelName=$('model-select').selectedOptions[0].textContent.split(' · ')[0];
+    text('diagnosis-summary',`${modelName} identified a candidate contract violation.`);text('repair-summary','Structured patch ready · not executed yet');
+    text('proposal-view',repair.run.record.proposal.unified_diff);$('candidate-preview').hidden=false;setStepStatus(2,'CANDIDATE READY','complete');finishMuseProgress();await history();notice('Candidate generated. Inspect the patch, then continue to the execution gate.');
+  }catch(error){setStepStatus(2,'TRY AGAIN','attention');failMuseProgress(error.message);throw error;}
 });
 $('continue-verify').onclick=()=>{setStepStatus(2,'CANDIDATE READY','complete');$('step-3').hidden=false;openStep(3);};
 $('verify-candidate').onclick=()=>task('Executing the candidate in isolated Docker, then asking Muse to challenge the evidence…',async()=>{
