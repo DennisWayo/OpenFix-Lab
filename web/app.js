@@ -203,15 +203,12 @@ function advanceToMuse(){setStepStatus(1,'ISSUE READY','complete');$('step-2').h
 $('confirm-solve').onclick=advanceToMuse;
 $('continue-muse').onclick=advanceToMuse;
 
-const modelDescriptions={
-  'muse-spark-1.3':'Latest Muse Spark for agentic coding workflows. Recommended; Standard mode.',
-  'muse-wonder-1.0':'Meta’s most capable Model API option for complex software engineering. Standard mode.',
-  'muse-spark-1.2':'Previous Muse Spark version for comparison or compatibility. Standard mode.'
-};
-$('model-select').onchange=()=>{state.wizard.model=$('model-select').value;text('model-description',modelDescriptions[state.wizard.model]);};
+const modelInputs=[...document.querySelectorAll('input[name="muse-model"]')];
+function selectedModel(){return modelInputs.find(input=>input.checked)||modelInputs[0];}
+modelInputs.forEach(input=>input.onchange=()=>{state.wizard.model=selectedModel().value;});
 $('generate-candidate').onclick=()=>task('Muse is diagnosing the issue and generating a focused candidate patch…',async()=>{
   if(!state.wizard.intake)throw new Error('Complete Step 01 before asking Muse for a repair.');
-  const apiKey=$('api-key').value;const model=$('model-select').value;state.wizard.model=model;setStepStatus(2,'MUSE WORKING');startMuseProgress();
+  const apiKey=$('api-key').value;const selection=selectedModel();const model=selection.value;state.wizard.model=model;setStepStatus(2,'MUSE WORKING');startMuseProgress();
   try{
     const diagnosis=await api('/api/model',{run_id:state.wizard.intake.id,action:'diagnose',api_key:apiKey,model});
     if(diagnosis.run.record.status!=='proposal_ready')throw new Error('Muse diagnosis was not valid structured output. Inspect the saved evidence and try again.');
@@ -219,7 +216,7 @@ $('generate-candidate').onclick=()=>task('Muse is diagnosing the issue and gener
     const repair=await api('/api/model',{run_id:diagnosis.run.id,action:'repair',api_key:apiKey,model});
     if(repair.run.record.status!=='proposal_ready')throw new Error('Muse did not return a valid candidate patch. Inspect the saved evidence and try again.');
     state.wizard.repair=repair.run;
-    const modelName=$('model-select').selectedOptions[0].textContent.split(' · ')[0];
+    const modelName=selection.dataset.name;
     text('diagnosis-summary',`${modelName} identified a candidate contract violation.`);text('repair-summary','Structured patch ready · not executed yet');
     const diff=repair.run.record.proposal.unified_diff;const figures=patchFigures(diff);
     text('proposal-view',diff);text('candidate-files',figures.files);text('candidate-additions',`+${figures.additions}`);text('candidate-removals',`−${figures.removals}`);$('candidate-preview').hidden=false;setStepStatus(2,'CANDIDATE READY','complete');finishMuseProgress();await history();notice('Candidate generated. Inspect the patch, then continue to the execution gate.');
@@ -245,8 +242,7 @@ $('reset-workflow').onclick=()=>window.location.reload();
 
 (async()=>{try{
   const status=await api('/api/status');state.token=status.token;state.wizard.model=status.model.model||'muse-spark-1.3';
-  if([...$('model-select').options].some(option=>option.value===state.wizard.model))$('model-select').value=state.wizard.model;
-  text('model-description',modelDescriptions[state.wizard.model]||modelDescriptions['muse-spark-1.3']);
+  const configuredModel=modelInputs.find(input=>input.value===state.wizard.model);if(configuredModel)configuredModel.checked=true;else state.wizard.model=selectedModel().value;
   text('model-status',`${status.model.models?.length||3} Muse models · key per request`);
   await history();
   if(window.OPENFIX_REPORT){await show(window.OPENFIX_REPORT);text('model-status','Execution report · read only');notice('This is a recorded execution report.');}

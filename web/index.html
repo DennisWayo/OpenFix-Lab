@@ -46,11 +46,15 @@
     <details class="wizard-step panel" id="step-2" hidden>
       <summary><span class="step-number">02</span><span class="step-heading"><strong>Generate candidate</strong><small>Choose a Muse model, diagnose the defect, and propose a focused patch.</small></span><span class="step-state" id="step-2-status">WAITING</span></summary>
       <div class="step-body">
-        <div class="model-grid">
-          <div><label for="model-select">Muse model</label><select id="model-select"><option value="muse-spark-1.3">Muse Spark 1.3 · Recommended</option><option value="muse-wonder-1.0">Muse Wonder 1.0 · Deep analysis</option><option value="muse-spark-1.2">Muse Spark 1.2 · Previous version</option></select><p class="hint" id="model-description">Latest Muse Spark for agentic coding workflows. Standard mode.</p></div>
-          <div><label for="api-key">Meta API key <span class="hint">request only; never saved</span></label><input type="password" id="api-key" autocomplete="off" placeholder="Paste your Meta Model API key"></div>
-        </div>
-        <button class="primary action-button" id="generate-candidate">Ask Muse to diagnose and propose a repair <span>→</span></button>
+        <fieldset class="model-showcase">
+          <legend>Muse model <span>Choose one model for this repair</span></legend>
+          <div class="model-options">
+            <label class="model-choice"><input type="radio" name="muse-model" value="muse-spark-1.3" data-name="Muse Spark 1.3" checked><span class="choice-check" aria-hidden="true">✓</span><span class="model-copy"><span class="model-title"><strong>Muse Spark 1.3</strong><em>Recommended</em></span><small>Latest agentic coding model · Standard mode</small></span></label>
+            <label class="model-choice"><input type="radio" name="muse-model" value="muse-wonder-1.0" data-name="Muse Wonder 1.0"><span class="choice-check" aria-hidden="true">✓</span><span class="model-copy"><span class="model-title"><strong>Muse Wonder 1.0</strong><em>Deep analysis</em></span><small>Most capable for complex software engineering</small></span></label>
+            <label class="model-choice"><input type="radio" name="muse-model" value="muse-spark-1.2" data-name="Muse Spark 1.2"><span class="choice-check" aria-hidden="true">✓</span><span class="model-copy"><span class="model-title"><strong>Muse Spark 1.2</strong><em>Previous</em></span><small>Earlier Spark release for comparison</small></span></label>
+          </div>
+        </fieldset>
+        <div class="api-action-row"><div><label for="api-key">Meta API key <span class="hint">request only; never saved</span></label><input type="password" id="api-key" autocomplete="off" placeholder="Paste your Meta Model API key"></div><button class="primary" id="generate-candidate">Ask Muse to diagnose and propose a repair <span>→</span></button></div>
         <div class="muse-progress" id="muse-progress" role="status" aria-live="polite" hidden>
           <div class="progress-heading"><span class="progress-orbit" aria-hidden="true"></span><div><strong id="muse-progress-title">Muse is diagnosing the issue</strong><small id="muse-progress-copy">Reading the pinned source and policy questions.</small></div><time id="muse-progress-time">00:00</time></div>
           <div class="progress-track" aria-hidden="true"><span></span></div>
