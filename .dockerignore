@@ -1,0 +1,7 @@
+.git
+.env
+artifacts
+imports
+runs
+OpenFix-Demo.html
+__pycache__

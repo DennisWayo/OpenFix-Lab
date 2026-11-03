@@ -1,0 +1,17 @@
+{
+  "issue_url": "https://github.com/facebookresearch/sam3/issues/585",
+  "revision": "f1647e8d0c1d280991f4d1b7d974c2704537fe66",
+  "issue_body": "CGF1 drops crowd ground truth before matching, while detections overlapping those regions can count as localization false positives.",
+  "observations": ["Prior isolated evaluator runs reproduced the localization discrepancy in bbox and RLE segmentation modes; consult the archived investigation for full provenance."],
+  "policy_questions": ["Should crowd-overlapping unmatched detections be ignored?", "How should crowd-only image-query pairs affect classification?"],
+  "candidate_policy": {
+    "status": "provisional",
+    "maintainer_endorsed": false,
+    "ordinary_match_precedence": true,
+    "unmatched_crowd_overlap": "ignore_for_localization_at_the_evaluator_matching_threshold",
+    "multiple_detections_per_crowd": "each_eligible_for_ignore",
+    "background_detection": "false_positive",
+    "crowd_only_classification": "preserve_existing_behavior_and_flag_semantic_uncertainty",
+    "review_question": "https://github.com/facebookresearch/sam3/issues/585#issuecomment-6470934831"
+  }
+}

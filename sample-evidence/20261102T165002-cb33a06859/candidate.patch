@@ -1,0 +1,34 @@
+--- a/sam3/eval/cgf1_eval.py
++++ b/sam3/eval/cgf1_eval.py
+@@ -284,6 +284,14 @@
+         # Load pre-computed ious
+         ious = self.ious[(imgId, catId)]
+ 
++        # Preserve crowd overlaps before removing ignored GT columns.
++        crowd_gt = np.array([bool(g.get("iscrowd", 0)) for g in all_gts], dtype=bool)
++        crowd_ious = (
++            ious[keep_dt, :][:, crowd_gt]
++            if len(ious) and np.any(crowd_gt)
++            else np.zeros((len(dt), 0))
++        )
++
+         # compute matching
+         if len(ious) == 0:
+             ious = np.zeros((len(dt), len(gt)))
+@@ -299,7 +307,15 @@
+         IL_perfect = []
+         for thresh in p.iouThrs:
+             TP = (match_scores >= thresh).sum()
+-            FP = len(dt) - TP
++            # Only unmatched detections may be ignored for crowd overlap.
++            ordinary_matched = np.zeros(len(dt), dtype=bool)
++            ordinary_matched[matched_dt[match_scores >= thresh]] = True
++            crowd_ignored = (
++                np.any(crowd_ious >= thresh, axis=1) & ~ordinary_matched
++                if crowd_ious.shape[1]
++                else np.zeros(len(dt), dtype=bool)
++            )
++            FP = len(dt) - TP - crowd_ignored.sum()
+             FN = len(gt) - TP
+             assert FP >= 0 and FN >= 0, (
+                 f"FP: {FP}, FN: {FN}, TP: {TP}, match_scores: {match_scores}, len(dt): {len(dt)}, len(gt): {len(gt)}, ious: {ious}"

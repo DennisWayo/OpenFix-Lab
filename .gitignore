@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+runs/
+.env
+imports/
+artifacts/
+.venv/
+OpenFix-Demo.html

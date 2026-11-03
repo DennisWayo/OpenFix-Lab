@@ -1,0 +1,2545 @@
+{
+  "schema": "openfix.evidence.v1",
+  "id": "20261102T165002-cb33a06859",
+  "created_at": "2026-11-02T16:50:02.976798+00:00",
+  "record": {
+    "kind": "sam3_demo",
+    "status": "conditional_local_pass",
+    "issue_url": "https://github.com/facebookresearch/sam3/issues/585",
+    "revision": "f1647e8d0c1d280991f4d1b7d974c2704537fe66",
+    "source_sha256": "ac9fb7ec0e0abe08261914311552fe36480853cd9532f166ae212bc3d31ac3e0",
+    "candidate_sha256": "40fac1594cefa65a2dd6039291a2315c96e86e2aada79c7d3a6efc922a21358a",
+    "evidence_level": "executed_reviewed_fixtures",
+    "model_involvement": "none_in_this_run",
+    "fixture_count": 32,
+    "passed_fixtures": 32,
+    "no_crowd_invariants": {
+      "passed": 500,
+      "total": 500
+    },
+    "results": [
+      {
+        "name": "ordinary_match",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          0,
+          0,
+          0
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "ordinary_plus_crowd",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "multiple_crowd_detections",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            2,
+            2,
+            2
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.4999375028126483,
+            0.4999375028126483,
+            0.4999375028126483
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 3,
+          "local_positive_F1s": [
+            0.4999375028126483,
+            0.4999375028126483,
+            0.4999375028126483
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 3,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          2,
+          2,
+          2
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "background_error",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_and_background",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            2,
+            2,
+            2
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.4999375028126483,
+            0.4999375028126483,
+            0.4999375028126483
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 3,
+          "local_positive_F1s": [
+            0.4999375028126483,
+            0.4999375028126483,
+            0.4999375028126483
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 3,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          2,
+          2,
+          2
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_only_detection",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "IL_TP": false,
+          "IL_FP": true,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "IL_TP": false,
+          "IL_FP": true,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_only_empty",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 1,
+          "IL_FP": 0,
+          "IL_FN": 0,
+          "num_dt": 0
+        },
+        "after": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 1,
+          "IL_FP": 0,
+          "IL_FN": 0,
+          "num_dt": 0
+        },
+        "expected_before_fp": null,
+        "expected_after_fp": null,
+        "classification_preserved": true
+      },
+      {
+        "name": "empty_query",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 1,
+          "IL_FP": 0,
+          "IL_FN": 0,
+          "num_dt": 0
+        },
+        "after": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 1,
+          "IL_FP": 0,
+          "IL_FN": 0,
+          "num_dt": 0
+        },
+        "expected_before_fp": null,
+        "expected_after_fp": null,
+        "classification_preserved": true
+      },
+      {
+        "name": "negative_query_detection",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "IL_TP": false,
+          "IL_FP": true,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "IL_TP": false,
+          "IL_FP": true,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "missed_ordinary",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 0,
+          "IL_FP": 0,
+          "IL_FN": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            1,
+            1,
+            1
+          ],
+          "local_F1s": [
+            0,
+            0,
+            0
+          ],
+          "local_positive_F1s": [
+            0,
+            0,
+            0
+          ],
+          "num_dt": 0
+        },
+        "after": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 0,
+          "IL_FP": 0,
+          "IL_FN": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            1,
+            1,
+            1
+          ],
+          "local_F1s": [
+            0,
+            0,
+            0
+          ],
+          "local_positive_F1s": [
+            0,
+            0,
+            0
+          ],
+          "num_dt": 0
+        },
+        "expected_before_fp": [
+          0,
+          0,
+          0
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "low_confidence_crowd",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          0,
+          0,
+          0
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "score_threshold_inclusive",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "ordinary_match_overlapping_crowd",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          0,
+          0,
+          0
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_overlap_half",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          0,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_overlap_below_half",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "duplicate_ordinary_without_crowd",
+        "mode": "bbox",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "ordinary_match",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          0,
+          0,
+          0
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "ordinary_plus_crowd",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "multiple_crowd_detections",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            2,
+            2,
+            2
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.4999375028126483,
+            0.4999375028126483,
+            0.4999375028126483
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 3,
+          "local_positive_F1s": [
+            0.4999375028126483,
+            0.4999375028126483,
+            0.4999375028126483
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 3,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          2,
+          2,
+          2
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "background_error",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_and_background",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            2,
+            2,
+            2
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.4999375028126483,
+            0.4999375028126483,
+            0.4999375028126483
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 3,
+          "local_positive_F1s": [
+            0.4999375028126483,
+            0.4999375028126483,
+            0.4999375028126483
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 3,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          2,
+          2,
+          2
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_only_detection",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "IL_TP": false,
+          "IL_FP": true,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "IL_TP": false,
+          "IL_FP": true,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_only_empty",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 1,
+          "IL_FP": 0,
+          "IL_FN": 0,
+          "num_dt": 0
+        },
+        "after": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 1,
+          "IL_FP": 0,
+          "IL_FN": 0,
+          "num_dt": 0
+        },
+        "expected_before_fp": null,
+        "expected_after_fp": null,
+        "classification_preserved": true
+      },
+      {
+        "name": "empty_query",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 1,
+          "IL_FP": 0,
+          "IL_FN": 0,
+          "num_dt": 0
+        },
+        "after": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 1,
+          "IL_FP": 0,
+          "IL_FN": 0,
+          "num_dt": 0
+        },
+        "expected_before_fp": null,
+        "expected_after_fp": null,
+        "classification_preserved": true
+      },
+      {
+        "name": "negative_query_detection",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "IL_TP": false,
+          "IL_FP": true,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "IL_TP": false,
+          "IL_FP": true,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "missed_ordinary",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 0,
+          "IL_FP": 0,
+          "IL_FN": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            1,
+            1,
+            1
+          ],
+          "local_F1s": [
+            0,
+            0,
+            0
+          ],
+          "local_positive_F1s": [
+            0,
+            0,
+            0
+          ],
+          "num_dt": 0
+        },
+        "after": {
+          "image_id": 1,
+          "IL_TP": 0,
+          "IL_TN": 0,
+          "IL_FP": 0,
+          "IL_FN": 1,
+          "TPs": [
+            0,
+            0,
+            0
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            1,
+            1,
+            1
+          ],
+          "local_F1s": [
+            0,
+            0,
+            0
+          ],
+          "local_positive_F1s": [
+            0,
+            0,
+            0
+          ],
+          "num_dt": 0
+        },
+        "expected_before_fp": [
+          0,
+          0,
+          0
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "low_confidence_crowd",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          0,
+          0,
+          0
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "score_threshold_inclusive",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "ordinary_match_overlapping_crowd",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            0,
+            0
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 1,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.9998500124991251,
+            0.9998500124991251
+          ]
+        },
+        "expected_before_fp": [
+          0,
+          0,
+          0
+        ],
+        "expected_after_fp": [
+          0,
+          0,
+          0
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_overlap_half",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            0,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.9998500124991251,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.9998500124991251,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          0,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "crowd_overlap_below_half",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      },
+      {
+        "name": "duplicate_ordinary_without_crowd",
+        "mode": "bitmap",
+        "passed": true,
+        "before": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "after": {
+          "image_id": 1,
+          "TPs": [
+            1,
+            1,
+            1
+          ],
+          "FPs": [
+            1,
+            1,
+            1
+          ],
+          "FNs": [
+            0,
+            0,
+            0
+          ],
+          "local_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ],
+          "IL_TP": true,
+          "IL_FP": false,
+          "IL_TN": false,
+          "IL_FN": false,
+          "num_dt": 2,
+          "local_positive_F1s": [
+            0.6665777829629381,
+            0.6665777829629381,
+            0.6665777829629381
+          ]
+        },
+        "expected_before_fp": [
+          1,
+          1,
+          1
+        ],
+        "expected_after_fp": [
+          1,
+          1,
+          1
+        ],
+        "classification_preserved": true
+      }
+    ],
+    "aggregate": {
+      "before": {
+        "TPs": [
+          11,
+          11,
+          11
+        ],
+        "FPs": [
+          12,
+          12,
+          12
+        ],
+        "positive_micro_FPs": [
+          10,
+          10,
+          10
+        ],
+        "FNs": [
+          1,
+          1,
+          1
+        ],
+        "precision": [
+          0.47825879017917317,
+          0.47825879017917317,
+          0.47825879017917317
+        ],
+        "positive_micro_precision": [
+          0.5238070294903358,
+          0.5238070294903358,
+          0.5238070294903358
+        ],
+        "recall": [
+          0.9166590278414347,
+          0.9166590278414347,
+          0.9166590278414347
+        ],
+        "F1": [
+          0.6285227787044443,
+          0.6285227787044443,
+          0.6285227787044443
+        ],
+        "positive_micro_F1": [
+          0.6666163484629974,
+          0.6666163484629974,
+          0.6666163484629974
+        ],
+        "positive_macro_F1": [
+          0.7271719764454819,
+          0.7271719764454819,
+          0.7271719764454819
+        ],
+        "IL_recall": 0.9166665902777842,
+        "IL_precision": 0.8461537810650938,
+        "IL_F1": 0.8799994304002887,
+        "IL_FPR": 0.49999987500003124,
+        "IL_MCC": 0.46225015283726384,
+        "cgF1": [
+          0.3081435089608393,
+          0.3081435089608393,
+          0.3081435089608393
+        ]
+      },
+      "after": {
+        "TPs": [
+          11,
+          11,
+          11
+        ],
+        "FPs": [
+          5,
+          6,
+          6
+        ],
+        "positive_micro_FPs": [
+          4,
+          5,
+          5
+        ],
+        "FNs": [
+          1,
+          1,
+          1
+        ],
+        "precision": [
+          0.6874957031518553,
+          0.6470550173234275,
+          0.6470550173234275
+        ],
+        "positive_micro_precision": [
+          0.7333284444770368,
+          0.6874957031518553,
+          0.6874957031518553
+        ],
+        "recall": [
+          0.9166590278414347,
+          0.9166590278414347,
+          0.9166590278414347
+        ],
+        "F1": [
+          0.7856596969561677,
+          0.7585669472319981,
+          0.7585669472319981
+        ],
+        "positive_micro_F1": [
+          0.8147593994617678,
+          0.7856596969561677,
+          0.7856596969561677
+        ],
+        "positive_macro_F1": [
+          0.8786601108496023,
+          0.8483626354372217,
+          0.8483626354372217
+        ],
+        "IL_recall": 0.9166665902777842,
+        "IL_precision": 0.8461537810650938,
+        "IL_F1": 0.8799994304002887,
+        "IL_FPR": 0.49999987500003124,
+        "IL_MCC": 0.46225015283726384,
+        "cgF1": [
+          0.37662265692679947,
+          0.3631713149960669,
+          0.3631713149960669
+        ]
+      }
+    },
+    "policy": {
+      "status": "provisional",
+      "maintainer_endorsed": false,
+      "crowd_only_classification": "existing behavior preserved; semantics unresolved"
+    },
+    "limitations": [
+      "Method-level evaluator test, not full CGF1Evaluator/pycocotools execution.",
+      "Bitmap geometry uses tiny binary masks, not compressed COCO RLE.",
+      "Exhaustive assignment adapter replaces SciPy for at most seven objects.",
+      "The candidate is a reviewed built-in patch; no Meta model generated it in this run.",
+      "No model inference, dataset-scale performance, or upstream policy endorsement established."
+    ],
+    "execution": {
+      "argv": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "-m",
+        "openfix.case_sam3"
+      ],
+      "started_at": "2026-11-02T16:50:02.595062+00:00",
+      "duration_seconds": 0.38,
+      "exit_code": 0,
+      "termination": "exited",
+      "stderr": "",
+      "isolation": "reviewed bundled fixture on host; not a sandbox for untrusted code",
+      "stdout_sha256": "e0cf3dcb9bae339530c9f4d442faeafb337c9da370501dae215f0efe20b86466"
+    }
+  },
+  "artifacts": [
+    {
+      "name": "candidate.patch",
+      "sha256": "4ab22ce99f55da7b5c56e37293b8b40136495027ea7c805c892ef3918a7cb764",
+      "bytes": 1430
+    },
+    {
+      "name": "source.py",
+      "sha256": "ac9fb7ec0e0abe08261914311552fe36480853cd9532f166ae212bc3d31ac3e0",
+      "bytes": 26264
+    },
+    {
+      "name": "candidate.py",
+      "sha256": "40fac1594cefa65a2dd6039291a2315c96e86e2aada79c7d3a6efc922a21358a",
+      "bytes": 27018
+    }
+  ],
+  "sha256": "b79a9ad887be7158c37008538190eacfc6b22ee4625e20313928ac8b510f3977"
+}
