@@ -46,7 +46,7 @@ def handler_class(root=None, port=8765):
     trusted_hosts = {urlparse(origin).netloc for origin in trusted_origins}
 
     class Handler(BaseHTTPRequestHandler):
-        server_version = "OpenFix/0.2"
+        server_version = "OpenFix/0.3"
 
         def log_message(self, fmt, *args):
             # Request bodies and API keys are deliberately absent from access logs.
@@ -81,7 +81,7 @@ def handler_class(root=None, port=8765):
             route = parsed.path
             try:
                 if route == "/api/status":
-                    return self.send(200,{"token":token,"model":configuration(),"docker_available":docker_available(),"version":"0.2.0"})
+                    return self.send(200,{"token":token,"model":configuration(),"docker_available":docker_available(),"version":"0.3.0"})
                 if route == "/api/runs":
                     return self.send(200,{"runs":store.list()})
                 if route.startswith("/api/runs/"):
@@ -126,7 +126,14 @@ def handler_class(root=None, port=8765):
                     run = bundled_demo(store)
                 elif self.path == "/api/workflow":
                     from .workflow import investigate
-                    run = investigate(store,api_key=data.get("api_key") or None,image=os.environ.get("OPENFIX_DOCKER_IMAGE","openfix-runner:local"))
+                    run = investigate(store,api_key=data.get("api_key") or None,
+                                      image=os.environ.get("OPENFIX_DOCKER_IMAGE","openfix-runner:local"),
+                                      model=data.get("model") or None)
+                elif self.path == "/api/finalize":
+                    from .workflow import finalize_candidate
+                    run = finalize_candidate(store,data.get("repair_id",""),api_key=data.get("api_key") or None,
+                                             image=os.environ.get("OPENFIX_DOCKER_IMAGE","openfix-runner:local"),
+                                             model=data.get("model") or None)
                 elif self.path == "/api/intake":
                     from .__main__ import intake
                     from .github import ingest
@@ -164,7 +171,8 @@ def handler_class(root=None, port=8765):
                     execution = record if record.get("kind")=="sam3_demo" else None
                     if record.get("kind","").startswith("model_"):
                         execution = {"previous_proposal":record,"parent_evidence_id":record.get("parent_evidence_id")}
-                    result = request_model(investigation,source,action=task,api_key=data.get("api_key") or None,execution=execution)
+                    result = request_model(investigation,source,action=task,api_key=data.get("api_key") or None,
+                                           execution=execution,model=data.get("model") or None)
                     result.update({"parent_evidence_id":parent["id"], "investigation_id":context_id or parent["id"],
                                    "issue_url":investigation.get("issue_url"),"revision":investigation.get("revision")})
                     artifacts = {}

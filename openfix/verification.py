@@ -120,6 +120,10 @@ def verify_proposal(store, proposal_id, image="openfix-runner:local"):
             "revision":proposal["revision"],"candidate_sha256":digest(candidate.encode()),
             "verification_scope":"SAM 3 evaluateImg methods and tiny geometry; provisional crowd policy",
             "patch_hunk_counts_normalized":applied_diff!=diff}
+    if proposal.get("investigation_id"):
+        record["investigation_id"] = proposal["investigation_id"]
+    if proposal.get("model"):
+        record["model"] = proposal["model"]
     head=capture(["git","rev-parse","HEAD"],cwd=ROOT,timeout=5,max_bytes=2000)
     if head["exit_code"]!=0:
         raise ValueError("The OpenFix runner must be committed in git before Docker verification")

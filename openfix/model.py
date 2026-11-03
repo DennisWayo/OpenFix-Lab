@@ -8,6 +8,13 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 from .evidence import digest, utcnow
 
 
+SUPPORTED_MODELS = {
+    "muse-spark-1.3": "Muse Spark 1.3",
+    "muse-wonder-1.0": "Muse Wonder 1.0",
+    "muse-spark-1.2": "Muse Spark 1.2",
+}
+
+
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         return None
@@ -15,7 +22,11 @@ class NoRedirect(HTTPRedirectHandler):
 
 def configuration():
     key = os.environ.get("META_API_KEY") or os.environ.get("MODEL_API_KEY")
-    return {"configured":bool(key), "model":os.environ.get("META_MODEL","muse-spark-1.3"),
+    model = os.environ.get("META_MODEL","muse-spark-1.3")
+    if model not in SUPPORTED_MODELS:
+        model = "muse-spark-1.3"
+    return {"configured":bool(key), "model":model,
+            "models":[{"id":model_id,"name":name} for model_id,name in SUPPORTED_MODELS.items()],
             "endpoint":os.environ.get("META_API_URL","https://api.meta.ai/v1/chat/completions")}
 
 
@@ -36,11 +47,14 @@ def parse_object(text, required):
     return result
 
 
-def request_model(record, source, *, action="diagnose", api_key=None, execution=None):
+def request_model(record, source, *, action="diagnose", api_key=None, execution=None, model=None):
     key = api_key or os.environ.get("META_API_KEY") or os.environ.get("MODEL_API_KEY")
     if not key:
         raise ValueError("Set META_API_KEY or MODEL_API_KEY, or enter a key for this request")
     config = configuration()
+    selected_model = model or config["model"]
+    if selected_model not in SUPPORTED_MODELS:
+        raise ValueError("Choose a supported Muse model")
     parsed = urlparse(config["endpoint"])
     if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
         raise ValueError("The model endpoint must be an HTTPS URL without embedded credentials")
@@ -62,7 +76,7 @@ def request_model(record, source, *, action="diagnose", api_key=None, execution=
     # calls need enough room for both that reasoning and the visible JSON/diff.
     reasoning_effort = "medium" if action == "repair" else "low"
     completion_budget = 16384 if action == "repair" else 8192
-    payload = {"model":config["model"],"messages":[{"role":"developer","content":instruction},
+    payload = {"model":selected_model,"messages":[{"role":"developer","content":instruction},
                   {"role":"user","content":json.dumps(context,ensure_ascii=False)}],
                "reasoning_effort":reasoning_effort,
                "max_completion_tokens":completion_budget}
@@ -92,7 +106,7 @@ def request_model(record, source, *, action="diagnose", api_key=None, execution=
         except ValueError as exc:
             proposal, validation_error = None, str(exc)
     return {"kind":"model_"+action, "status":"proposal_ready" if proposal else "invalid_model_response",
-            "evidence_level":"model_hypothesis", "created_at":utcnow(), "model":config["model"],
+            "evidence_level":"model_hypothesis", "created_at":utcnow(), "model":selected_model,
             "request_sha256":digest(payload), "input_sha256":digest(record), "source_sha256":digest(source.encode()),
             "execution_evidence_sha256":digest(execution) if execution else None,
             "proposal":proposal,"raw_response":content, "validation_error":validation_error,

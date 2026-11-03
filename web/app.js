@@ -1,11 +1,11 @@
-let state={token:'',run:null,integrity:null,mode:'bbox',tab:'results',busy:false,execution:null,supporting:{}};
+let state={token:'',run:null,integrity:null,mode:'bbox',tab:'results',busy:false,execution:null,supporting:{},wizard:{intake:null,diagnosis:null,repair:null,model:'muse-spark-1.3'}};
 const $=id=>document.getElementById(id);
 function text(id,value){$(id).textContent=value??'';}
 function notice(message,error=false){text('notice',message);$('notice').hidden=false;$('notice').classList.toggle('error',error);}
 async function api(path,data){
   if(window.OPENFIX_REPORT){
-    if(data)throw new Error('This is an exported execution report. Start the local OpenFix app for new runs or live Meta requests.');
-    if(path==='/api/status')return {token:'export',model:{configured:false,model:'Exported execution evidence'}};
+    if(data)throw new Error('This is an exported execution report. Start the local OpenFix app for new runs.');
+    if(path==='/api/status')return {token:'export',model:{configured:false,model:'Exported evidence',models:[]}};
     if(path==='/api/runs')return {runs:[{id:window.OPENFIX_REPORT.run.id,created_at:window.OPENFIX_REPORT.run.created_at,kind:window.OPENFIX_REPORT.run.record.kind,status:window.OPENFIX_REPORT.run.record.status}]};
     if(path.startsWith('/api/runs/'))return window.OPENFIX_REPORT;
     throw new Error('Unavailable in exported report');
@@ -16,31 +16,31 @@ async function api(path,data){
   return value;
 }
 function busy(value){state.busy=value;document.querySelectorAll('button').forEach(button=>button.disabled=value);}
-async function task(label,fn){if(state.busy)return;busy(true);notice(label);try{await fn();}catch(error){notice(error.message,true);}finally{busy(false);}}
-function label(value){return value.replaceAll('_',' ').replace(/^./,character=>character.toUpperCase());}
-function isPass(status){return ['conditional_local_pass','passed','proposal_ready'].includes(status);}
+async function task(message,fn){if(state.busy)return;busy(true);notice(message);try{await fn();}catch(error){notice(error.message,true);}finally{busy(false);}}
+function label(value){return String(value||'').replaceAll('_',' ').replace(/^./,character=>character.toUpperCase());}
+function isPass(status){return ['conditional_local_pass','passed','proposal_ready','intake_only'].includes(status);}
 function download(name,value,type='text/plain'){const anchor=document.createElement('a');anchor.href=URL.createObjectURL(new Blob([value],{type}));anchor.download=name;anchor.click();setTimeout(()=>URL.revokeObjectURL(anchor.href),1000);}
+function openStep(number){
+  for(const index of [1,2,3]){const step=$('step-'+index);if(index<=number)step.hidden=false;step.open=index===number;}
+  $('step-'+number).scrollIntoView({behavior:'smooth',block:'start'});
+}
+function setStepStatus(number,value,kind=''){text(`step-${number}-status`,value);$(`step-${number}-status`).className='step-state '+kind;}
 
-async function history(loadLatest=false){
+async function history(){
   const {runs}=await api('/api/runs');
   $('history').replaceChildren();
   for(const run of runs.slice(0,9)){
     const item=document.createElement('div');
     item.className='history-item '+(isPass(run.status)?'history-pass':'history-warn');
     if(state.run?.id===run.id)item.classList.add('active');
-    item.tabIndex=0;
-    item.dataset.runId=run.id;
-    item.setAttribute('role','button');
-    const title=document.createElement('span');
-    title.textContent=label(run.kind||'Investigation');
-    const small=document.createElement('small');
-    small.textContent=label(run.status||'Saved')+' · '+new Date(run.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    item.tabIndex=0;item.dataset.runId=run.id;item.setAttribute('role','button');
+    const title=document.createElement('span');title.textContent=label(run.kind||'Investigation');
+    const small=document.createElement('small');small.textContent=label(run.status||'Saved')+' · '+new Date(run.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     item.append(title,small);
-    item.onclick=()=>task('Loading evidence…',async()=>{await show(await api('/api/runs/'+run.id));await history();notice('Saved evidence loaded.');});
+    item.onclick=()=>task('Loading saved evidence…',async()=>{await show(await api('/api/runs/'+run.id));await history();notice('Saved evidence loaded.');});
     item.onkeydown=event=>{if(event.key==='Enter')item.click();};
     $('history').append(item);
   }
-  if(loadLatest&&runs[0])await show(await api('/api/runs/'+runs[0].id));
 }
 
 function setTab(tab){
@@ -53,120 +53,119 @@ function executionRecord(){
   return record.kind==='model_verification'?(record.test_results||{}):record;
 }
 function renderJourney(record){
-  const journey=$('workflow-journey');
-  journey.replaceChildren();
+  const journey=$('workflow-journey');journey.replaceChildren();
   if(record.kind!=='meta_workflow'){journey.hidden=true;return;}
   journey.hidden=false;
   for(const stage of record.stages||[]){
-    const item=document.createElement('div');
-    item.className='journey-step '+(isPass(stage.status)?'done':'attention');
-    const mark=document.createElement('span');
-    mark.textContent=isPass(stage.status)?'✓':'!';
-    const copy=document.createElement('div');
-    const strong=document.createElement('strong');
-    strong.textContent=label(stage.stage.replace(/_\d+$/,''));
-    const small=document.createElement('small');
-    small.textContent=label(stage.status);
-    copy.append(strong,small);
-    item.append(mark,copy);
-    journey.append(item);
+    const item=document.createElement('div');item.className='journey-step '+(isPass(stage.status)?'done':'attention');
+    const mark=document.createElement('span');mark.textContent=isPass(stage.status)?'✓':'!';
+    const copy=document.createElement('div');const strong=document.createElement('strong');strong.textContent=label(stage.stage.replace(/_\d+$/,''));
+    const small=document.createElement('small');small.textContent=label(stage.status);copy.append(strong,small);item.append(mark,copy);journey.append(item);
   }
 }
 function renderOutcome(record,executed){
   const passed=record.status==='conditional_local_pass';
-  text('outcome-kicker',record.kind==='meta_workflow'?'LIVE META WORKFLOW':'RECORDED EVIDENCE');
-  text('outcome-title',passed?(record.kind==='meta_workflow'?'Meta candidate passed the reviewed verification scope':'Candidate passed the reviewed verification scope'):label(record.status||'Evidence loaded'));
+  text('outcome-kicker',record.kind==='meta_workflow'?'COMPLETED INVESTIGATION':'RECORDED EVIDENCE');
+  text('outcome-title',passed?'Candidate passed the reviewed verification scope':label(record.status||'Evidence loaded'));
   const hasChecks=executed.fixture_count&&executed.no_crowd_invariants;
-  text('outcome-copy',passed&&hasChecks?`The executed candidate passed ${executed.passed_fixtures}/${executed.fixture_count} geometry fixtures and ${executed.no_crowd_invariants.passed}/${executed.no_crowd_invariants.total} compatibility checks. The policy remains provisional pending maintainer guidance.`:record.kind.startsWith('model_')?'This is a model hypothesis. Select a verification record before treating it as executed evidence.':'Open the evidence details to inspect provenance, limits, and recorded stages.');
+  text('outcome-copy',passed&&hasChecks?`The exact candidate passed ${executed.passed_fixtures}/${executed.fixture_count} geometry fixtures and ${executed.no_crowd_invariants.passed}/${executed.no_crowd_invariants.total} compatibility checks. The policy remains provisional pending maintainer guidance.`:record.kind.startsWith('model_')?'This is a model hypothesis. It is not execution evidence until Step 03 completes.':'Inspect the provenance and limitations before acting on this result.');
   text('outcome-badge',passed?'CONDITIONAL PASS':label(record.status||'RECORDED'));
   $('outcome-card').classList.toggle('attention',!passed);
 }
 function table(){
-  const record=executionRecord();
-  $('fixture-table').replaceChildren();
+  const record=executionRecord();$('fixture-table').replaceChildren();
   for(const item of (record.results||[]).filter(result=>result.mode===state.mode)){
-    const row=document.createElement('tr');
-    const before=item.before.FPs?.[0]??'—';
-    const after=item.after.FPs?.[0]??'—';
-    if(before!==after)row.className='changed';
+    const row=document.createElement('tr');const before=item.before.FPs?.[0]??'—';const after=item.after.FPs?.[0]??'—';if(before!==after)row.className='changed';
     for(const value of [label(item.name),before,after]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}
-    const cell=document.createElement('td');
-    const badge=document.createElement('span');
-    badge.className='pass'+(item.passed?'':' fail');
-    badge.textContent=item.passed?'PASS':'FAIL';
-    cell.append(badge);row.append(cell);$('fixture-table').append(row);
+    const cell=document.createElement('td');const badge=document.createElement('span');badge.className='pass'+(item.passed?'':' fail');badge.textContent=item.passed?'PASS':'FAIL';cell.append(badge);row.append(cell);$('fixture-table').append(row);
   }
   const hasResults=(record.results||[]).length>0;
-  text('results-title',state.run?.record.kind==='meta_workflow'?'Executed Meta candidate':'Before and after');
+  text('results-title',state.run?.record.kind==='meta_workflow'?'Executed candidate':'Before and after');
   text('results-tag',hasResults?'Localization false positives at overlap ≥ 0.50':'No execution results in this record');
-  text('result-explanation',hasResults?'Full results retain overlap thresholds 0.50, 0.75, and 0.95. Crowd-only classification is preserved and explicitly flagged. These checks exercise selected evaluator methods, not full SAM 3 inference or dataset-scale evaluation.':'This record is a hypothesis or intake step. Select a verification or completed workflow to see executed results.');
+  text('result-explanation',hasResults?'Results retain overlap thresholds 0.50, 0.75, and 0.95. Crowd-only classification remains explicitly flagged. These checks exercise selected evaluator methods, not full SAM 3 inference or dataset-scale evaluation.':'Select a completed workflow or verification record to see executed results.');
 }
-async function loadStage(record,name){
-  const stage=(record.stages||[]).find(item=>item.stage===name||item.stage.startsWith(name+'_'));
-  if(!stage||window.OPENFIX_REPORT)return null;
-  return api('/api/runs/'+stage.evidence_id);
-}
-async function artifactText(run){
-  const artifact=run?.artifacts?.find(item=>item.name.endsWith('.patch'));
-  if(!artifact)return null;
-  if(window.OPENFIX_REPORT)return window.OPENFIX_REPORT.files[artifact.name];
-  return fetch('/api/artifact?id='+run.id+'&name='+encodeURIComponent(artifact.name)).then(response=>response.text());
-}
+async function loadStage(record,name){const stage=(record.stages||[]).find(item=>item.stage===name||item.stage.startsWith(name+'_'));if(!stage||window.OPENFIX_REPORT)return null;return api('/api/runs/'+stage.evidence_id);}
+async function artifactText(run){const artifact=run?.artifacts?.find(item=>item.name.endsWith('.patch'));if(!artifact)return null;if(window.OPENFIX_REPORT)return window.OPENFIX_REPORT.files[artifact.name];return fetch('/api/artifact?id='+run.id+'&name='+encodeURIComponent(artifact.name)).then(response=>response.text());}
+
 async function show(payload){
-  state.run=payload.run;
-  state.integrity=payload.integrity;
-  state.execution=null;
-  state.supporting={};
-  $('empty-state').hidden=true;
-  $('result').hidden=false;
+  state.run=payload.run;state.integrity=payload.integrity;state.execution=null;state.supporting={};
   const record=state.run.record;
   if(record.kind==='meta_workflow'){
     const [verification,repair,challenge]=await Promise.all([loadStage(record,'candidate_verification'),loadStage(record,'meta_repair'),loadStage(record,'meta_challenge')]);
-    state.execution=verification?.run||null;
-    state.supporting={repair:repair?.run||null,challenge:challenge?.run||null};
+    state.execution=verification?.run||null;state.supporting={repair:repair?.run||null,challenge:challenge?.run||null};
   }else if(record.kind==='model_verification')state.execution=state.run;
   const executed=executionRecord();
-  const demo=record.kind==='sam3_demo';
+  $('result').hidden=false;$('verification-intro').hidden=true;openStep(3);
+  setStepStatus(1,'ISSUE READY','complete');setStepStatus(2,'CANDIDATE READY','complete');setStepStatus(3,label(record.status||'RECORDED').toUpperCase(),isPass(record.status)?'complete':'attention');
   text('metric-status',label(record.status||'Recorded'));
-  text('metric-scope',record.kind==='meta_workflow'?'Live Meta workflow · repair executed in Docker':demo?'Reviewed baseline fixture execution':record.evidence_level==='model_hypothesis'?'Model proposal · not execution evidence':'Recorded investigation evidence');
+  text('metric-scope',record.kind==='meta_workflow'?'Muse candidate · isolated Docker execution':record.evidence_level==='model_hypothesis'?'Model proposal · not execution evidence':'Recorded investigation evidence');
   text('metric-cases',executed.fixture_count?`${executed.passed_fixtures} / ${executed.fixture_count}`:'—');
   text('metric-invariants',executed.no_crowd_invariants?`${executed.no_crowd_invariants.passed} / ${executed.no_crowd_invariants.total}`:'—');
   text('metric-integrity',payload.integrity?.passed?'Verified':'Check failed');
   text('evidence-view',JSON.stringify(payload,null,2));
-  $('limitations').replaceChildren();
-  for(const value of record.limitations||['Model suggestions and issue reports require execution before being treated as verified behavior.']){const item=document.createElement('li');item.textContent=value;$('limitations').append(item);}
+  $('limitations').replaceChildren();for(const value of record.limitations||['Model suggestions require execution before they become behavioral evidence.']){const item=document.createElement('li');item.textContent=value;$('limitations').append(item);}
   const challenge=state.supporting.challenge?.record;
-  text('model-view',challenge?.proposal?JSON.stringify({workflow_status:record.status,final_challenge:challenge.proposal},null,2):record.proposal?JSON.stringify(record.proposal,null,2):record.raw_response||'No Meta reasoning is attached to this view.');
-  let diff=await artifactText(state.run);
-  if(!diff)diff=await artifactText(state.supporting.repair);
+  text('model-view',challenge?.proposal?JSON.stringify(challenge.proposal,null,2):record.proposal?JSON.stringify(record.proposal,null,2):record.raw_response||'No model challenge is attached to this view.');
+  text('model-name',record.model||challenge?.model||'Muse');
+  let diff=await artifactText(state.run);if(!diff)diff=await artifactText(state.supporting.repair);
   text('patch-view',diff||'No candidate patch in this evidence record.');
-  text('patch-hint',record.kind==='meta_workflow'?'Meta-generated candidate patch executed by the recorded Docker verification. The policy remains provisional.':demo?'Built-in reviewed baseline candidate under the provisional policy.':'Patch attached to this evidence record; execution status is shown above.');
-  renderOutcome(record,executed);
-  renderJourney(record);
-  table();
-  if(record.kind==='meta_workflow'||record.kind==='model_verification'||demo)setTab('results');
-  else if(record.kind.startsWith('model_'))setTab('meta');
-  else setTab('evidence');
-  if(record.kind==='meta_workflow'&&record.status==='conditional_local_pass')text('model-status','Live Meta workflow recorded');
+  text('patch-hint',record.kind==='meta_workflow'?'Muse-generated candidate patch executed by the recorded Docker verification. The policy remains provisional.':'Patch attached to this evidence record; execution status is shown above.');
+  renderOutcome(record,executed);renderJourney(record);table();setTab('results');
   document.querySelectorAll('.history-item').forEach(item=>item.classList.toggle('active',item.dataset.runId===state.run.id));
 }
 
-$('run-demo').onclick=()=>task('Running the reviewed baseline fixtures and compatibility checks…',async()=>{await show(await api('/api/demo',{}));await history();notice('Baseline verification complete. Inspect the results, candidate patch, and evidence limits.');});
-$('intake-form').onsubmit=event=>{event.preventDefault();task('Reading issue and pinning source context…',async()=>{await show(await api('/api/intake',{issue_url:$('issue-url').value.trim(),source_paths:$('source-paths').value.split('\n').map(value=>value.trim()).filter(Boolean),refresh:$('fresh-intake').checked}));await history();notice('Issue intake saved. Source and claims are ready for inspection.');});};
+function renderIssue(record){
+  text('issue-title','SAM 3 · Crowd annotations and false positives');text('issue-body',record.issue_body||record.title||'Issue context loaded.');
+  try{const url=new URL(record.issue_url);text('issue-repository',url.pathname.split('/').slice(1,3).join('/'));}catch{text('issue-repository','Public GitHub repository');}
+  text('issue-revision',(record.revision||'not pinned').slice(0,12));text('issue-questions',(record.policy_questions||[]).join(' · ')||'Review the recorded issue context.');
+  $('issue-preview').hidden=false;setStepStatus(1,'INSPECTED','complete');
+}
+
+$('intake-form').onsubmit=event=>{event.preventDefault();task('Inspecting the issue and pinning source context…',async()=>{
+  const payload=await api('/api/intake',{issue_url:$('issue-url').value.trim(),source_paths:$('source-paths').value.split('\n').map(value=>value.trim()).filter(Boolean),refresh:$('fresh-intake').checked});
+  state.wizard.intake=payload.run;renderIssue(payload.run.record);await history();notice('Issue inspected. Review the context, then choose whether to ask Muse for a repair.');$('solve-dialog').showModal();
+});};
+$('confirm-solve').onclick=()=>{setStepStatus(1,'ISSUE READY','complete');$('step-2').hidden=false;setTimeout(()=>openStep(2),0);};
+
+const modelDescriptions={
+  'muse-spark-1.3':'Latest Muse Spark for agentic coding workflows. Recommended; Standard mode.',
+  'muse-wonder-1.0':'Meta’s most capable Model API option for complex software engineering. Standard mode.',
+  'muse-spark-1.2':'Previous Muse Spark version for comparison or compatibility. Standard mode.'
+};
+$('model-select').onchange=()=>{state.wizard.model=$('model-select').value;text('model-description',modelDescriptions[state.wizard.model]);};
+$('generate-candidate').onclick=()=>task('Muse is diagnosing the issue and generating a focused candidate patch…',async()=>{
+  if(!state.wizard.intake)throw new Error('Complete Step 01 before asking Muse for a repair.');
+  const apiKey=$('api-key').value;const model=$('model-select').value;state.wizard.model=model;setStepStatus(2,'MUSE WORKING');
+  const diagnosis=await api('/api/model',{run_id:state.wizard.intake.id,action:'diagnose',api_key:apiKey,model});
+  if(diagnosis.run.record.status!=='proposal_ready')throw new Error('Muse diagnosis was not valid structured output. Inspect the saved evidence and try again.');
+  state.wizard.diagnosis=diagnosis.run;
+  const repair=await api('/api/model',{run_id:diagnosis.run.id,action:'repair',api_key:apiKey,model});
+  if(repair.run.record.status!=='proposal_ready')throw new Error('Muse did not return a valid candidate patch. Inspect the saved evidence and try again.');
+  state.wizard.repair=repair.run;
+  const modelName=$('model-select').selectedOptions[0].textContent.split(' · ')[0];
+  text('diagnosis-summary',`${modelName} identified a candidate contract violation.`);text('repair-summary','Structured patch ready · not executed yet');
+  text('proposal-view',repair.run.record.proposal.unified_diff);$('candidate-preview').hidden=false;setStepStatus(2,'CANDIDATE READY','complete');await history();notice('Candidate generated. Inspect the patch, then continue to the execution gate.');
+});
+$('continue-verify').onclick=()=>{setStepStatus(2,'CANDIDATE READY','complete');$('step-3').hidden=false;openStep(3);};
+$('verify-candidate').onclick=()=>task('Executing the candidate in isolated Docker, then asking Muse to challenge the evidence…',async()=>{
+  if(!state.wizard.repair)throw new Error('Complete Step 02 before verification.');
+  setStepStatus(3,'VERIFYING');
+  const payload=await api('/api/finalize',{repair_id:state.wizard.repair.id,api_key:$('api-key').value,model:state.wizard.model});
+  $('api-key').value='';await show(payload);await history();notice('Verification and challenge complete. Review what passed and what remains uncertain.');
+});
+
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>setTab(button.dataset.tab));
 document.querySelectorAll('[data-mode]').forEach(button=>button.onclick=()=>{state.mode=button.dataset.mode;document.querySelectorAll('[data-mode]').forEach(item=>item.classList.toggle('selected',item===button));table();});
-document.querySelectorAll('[data-model-action]').forEach(button=>button.onclick=()=>task('Meta is examining the source and evidence. This request may take a minute…',async()=>{if(!state.run)throw new Error('Run verification or inspect an issue first.');const key=$('api-key').value;try{await show(await api('/api/model',{run_id:state.run.id,action:button.dataset.modelAction,api_key:key}));await history();notice('Meta response saved as an unverified proposal. Inspect its reasoning and open questions.');}finally{$('api-key').value='';}}));
 $('download-record').onclick=()=>download('openfix-'+state.run.id+'.json',JSON.stringify({run:state.run,integrity:state.integrity},null,2),'application/json');
-$('verify-proposal').onclick=()=>task('Staging the model patch and checking the Docker verification environment…',async()=>{if(state.run?.record.kind!=='model_repair')throw new Error('Select a Meta repair proposal from evidence history first.');await show(await api('/api/verify',{run_id:state.run.id}));await history();notice('Verification record saved. Inspect its status and execution evidence.');});
-$('run-workflow').onclick=()=>task('Running the complete Meta workflow. Diagnosis, repair, verification, and challenge can take several minutes…',async()=>{const key=$('api-key').value;try{await show(await api('/api/workflow',{api_key:key}));await history();notice('Workflow finished with status: '+label(state.run.record.status)+'. Each stage is saved separately.');}finally{$('api-key').value='';}});
 $('download-patch').onclick=()=>download('openfix-candidate.patch',$('patch-view').textContent);
-$('refresh').onclick=()=>task('Refreshing evidence history…',async()=>{await history();notice('Evidence history refreshed.');});
+$('refresh').onclick=()=>task('Refreshing past evidence…',async()=>{await history();notice('Past evidence refreshed.');});
+$('reset-workflow').onclick=()=>window.location.reload();
 
 (async()=>{try{
-  const status=await api('/api/status');
-  state.token=status.token;
-  text('model-status',status.model.configured?'Meta key configured on server':'Meta key accepted per request');
-  text('model-name',status.model.model);
-  if(window.OPENFIX_REPORT){await show(window.OPENFIX_REPORT);text('model-status','Execution report · read only');notice('Exported from a real local fixture run. New runs and Meta requests require the local application.');}
-  else await history(true);
+  const status=await api('/api/status');state.token=status.token;state.wizard.model=status.model.model||'muse-spark-1.3';
+  if([...$('model-select').options].some(option=>option.value===state.wizard.model))$('model-select').value=state.wizard.model;
+  text('model-description',modelDescriptions[state.wizard.model]||modelDescriptions['muse-spark-1.3']);
+  text('model-status',`${status.model.models?.length||3} Muse models · key per request`);
+  await history();
+  if(window.OPENFIX_REPORT){await show(window.OPENFIX_REPORT);text('model-status','Execution report · read only');notice('This is a recorded execution report.');}
 }catch(error){notice(error.message,true);}})();

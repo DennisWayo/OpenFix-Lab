@@ -151,3 +151,65 @@ footer span{text-align:right}
   footer{flex-direction:column}
   footer span{text-align:left}
 }
+
+/* Progressive investigation wizard */
+.wizard{display:grid;gap:14px}
+.wizard-step{padding:0;margin:0;overflow:hidden;color:var(--ink)}
+.wizard-step>summary{list-style:none;display:flex;align-items:center;gap:15px;padding:20px 22px;background:#fff}
+.wizard-step>summary::-webkit-details-marker{display:none}
+.wizard-step[open]{box-shadow:0 8px 28px #173f2c12;border-color:#cbd7cb}
+.wizard-step[open]>summary{border-bottom:1px solid var(--line);background:#fafcf8}
+.step-number{display:grid;place-items:center;width:38px;height:38px;border:1px solid #cfd8cd;border-radius:9px;color:var(--green);font:13px ui-monospace,monospace;font-weight:700;background:#f8faf5}
+.step-heading{display:flex;flex-direction:column;line-height:1.35}
+.step-heading strong{font-size:17px;letter-spacing:-.2px}
+.step-heading small{color:var(--muted);font-size:11px;font-weight:400;margin-top:4px}
+.step-state{margin-left:auto;border:1px solid var(--line);border-radius:99px;padding:5px 9px;font:9px ui-monospace,monospace;letter-spacing:.8px;color:var(--muted)}
+.step-state.complete{color:var(--green);border-color:#bcd3c4;background:#edf6ee}
+.step-state.attention{color:#855b1d;border-color:#dec995;background:#fff7e6}
+.step-body{padding:24px 26px 26px}
+.advanced-actions{border:1px solid var(--line);border-radius:7px;padding:10px 12px;margin:14px 0 0}
+.advanced-actions summary{color:var(--muted);font-weight:600}
+.issue-preview{display:grid;grid-template-columns:1.5fr 1fr;gap:32px;border-top:1px solid var(--line);margin-top:22px;padding-top:22px}
+.issue-preview h2{font-size:22px;margin:4px 0}
+.issue-preview p{color:var(--muted)}
+.issue-preview dl{margin:0;display:grid;gap:10px}
+.issue-preview dl>div{border-bottom:1px solid #ebefe9;padding-bottom:8px}
+.issue-preview dt{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+.issue-preview dd{margin:2px 0 0;font-size:12px}
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+select{width:100%;border:1px solid #d9e0d6;background:#fafbf8;border-radius:6px;padding:11px 13px;color:var(--ink)}
+select:focus{outline:2px solid #8fae99;outline-offset:1px}
+.action-button{margin-top:18px}
+.candidate-preview{margin-top:22px;padding:18px;border:1px solid #cddbcf;background:#f6faf5;border-radius:9px}
+.candidate-check{display:flex;gap:10px;align-items:center;margin:5px 0 12px}
+.candidate-check>span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#dfeee2;color:var(--green);font-weight:700}
+.candidate-check strong,.candidate-check small{display:block}
+.candidate-check small{font-size:10px;color:var(--muted)}
+.candidate-preview details{margin:12px 0}
+.candidate-preview pre{max-height:280px}
+.verification-intro{display:flex;justify-content:space-between;align-items:center;gap:30px;border:1px solid #d2ddd1;background:#f8faf6;border-radius:9px;padding:22px}
+.verification-intro h2{font-size:22px;margin:4px 0}
+.verification-intro p{color:var(--muted);max-width:760px;margin-bottom:0}
+#result{margin-top:2px}
+.inner-panel{box-shadow:none}
+.reset-button{margin-top:18px}
+dialog{width:min(520px,calc(100vw - 36px));border:1px solid #cbd7cb;border-radius:14px;padding:0;box-shadow:0 28px 80px #0b211f45;color:var(--ink)}
+dialog::backdrop{background:#10252299;backdrop-filter:blur(3px)}
+dialog form{position:relative;padding:30px;text-align:center}
+.dialog-close{position:absolute;right:12px;top:12px;border:0;background:none;font-size:22px;padding:4px 9px;color:var(--muted)}
+.dialog-symbol{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;margin:0 auto 14px;background:#e6f0e5;color:var(--green);font-size:24px}
+dialog h2{font-size:24px}
+dialog p{color:var(--muted);margin:10px auto 22px;max-width:410px}
+.dialog-actions{display:flex;justify-content:center;gap:10px}
+
+@media(max-width:900px){
+  .issue-preview,.model-grid{grid-template-columns:1fr}
+  .verification-intro{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:760px){
+  .wizard-step>summary{padding:16px;gap:10px}
+  .step-heading small{display:none}
+  .step-body{padding:18px}
+  .step-state{font-size:8px}
+  .dialog-actions{flex-direction:column-reverse}
+}

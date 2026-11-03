@@ -19,10 +19,11 @@ python -m openfix serve
 
 Open **http://127.0.0.1:8765**. When dependencies are installed, `start.command` also starts the server. The app binds only to loopback.
 
-1. Click **Run verification** for the reviewed fixture demonstration.
-2. Inspect results, candidate diff, evidence, and policy limits.
-3. Open **Meta investigation**, enter a Meta key, and choose **Run Meta workflow**.
-4. The workflow requests diagnosis, repair, Docker verification, and a fresh model challenge. At most two repair attempts are allowed; every stage is saved.
+1. **Inspect issue** loads the report, pinned revision, source context, and open policy questions.
+2. Confirm **Ask Muse to solve this issue?**, choose a Muse model, and enter a request-only Meta key. OpenFix requests a structured diagnosis and candidate patch, but does not execute it yet.
+3. **Verify & review** stages the exact patch, executes it in isolated Docker, and requests a fresh Muse challenge. The final view separates executed results, candidate patch, model criticism, and raw evidence.
+
+The guided interface exposes `muse-spark-1.3` (recommended), `muse-wonder-1.0` (deep analysis), and `muse-spark-1.2` (previous version) in Standard mode. Model availability depends on the Meta account. See the [official model catalog](https://dev.meta.ai/docs/models).
 
 `META_API_KEY` or `MODEL_API_KEY` may supply the key instead. UI keys are used for the request and never written to evidence or browser storage. Default model: `muse-spark-1.3`; endpoint: `https://api.meta.ai/v1/chat/completions`. Override with `META_MODEL` and `META_API_URL`. See the [official Meta quickstart](https://dev.meta.ai/docs/cookbook/quickstart-chat-completions).
 
@@ -33,7 +34,7 @@ Open **http://127.0.0.1:8765**. When dependencies are installed, `start.command`
 - Ordinary matching, genuine background errors, false negatives, and image classification are preserved under the provisional localization policy.
 - A recorded live `muse-spark-1.3` workflow completed with `conditional_local_pass`: Meta diagnosis, first repair proposal, isolated Docker verification, and a fresh Meta challenge. Workflow evidence: `20261103T063701-97ca14bbbd`.
 - The Meta-generated candidate passed 32/32 reviewed geometry fixtures and 500/500 no-crowd invariants in Docker without network access. Verification evidence: `20261103T063647-debe68837e`.
-- 26 application tests cover fixtures, patch scope and hunk normalization, evidence tampering, model response handling and reasoning budgets, subprocess limits, in-memory HTTP routes, origin checks, trusted HTTPS proxying, Mac loopback startup, and blocked verification.
+- 29 application tests cover fixtures, patch scope and hunk normalization, evidence tampering, per-run Muse model selection, progressive workflow linkage and rejection records, model response handling and reasoning budgets, subprocess limits, in-memory HTTP routes, origin checks, trusted HTTPS proxying, Mac loopback startup, and blocked verification.
 - The `export` command produces an interactive report from a recorded run. An exported fixture report is not a live Meta session.
 
 ## Execution and scope

@@ -17,7 +17,7 @@ from openfix.report import export_report
 from openfix.runner import capture, docker_run
 from openfix.verification import stage_patch
 from openfix.web import handler_class, LoopbackThreadingHTTPServer
-from openfix.workflow import investigate
+from openfix.workflow import finalize_candidate, investigate
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -89,16 +89,22 @@ class ModelTests(unittest.TestCase):
         content={k:[] for k in ("failure_hypothesis","violated_contract","minimal_reproducer","verification_plan","unresolved_questions")}
         response=io.BytesIO(json.dumps({"choices":[{"message":{"content":json.dumps(content)}}],"usage":{"total_tokens":42}}).encode())
         opener.return_value.open.return_value=response
-        result=request_model({"revision":"a"*40},"source")
+        result=request_model({"revision":"a"*40},"source",model="muse-wonder-1.0")
         request=opener.return_value.open.call_args.args[0]
         self.assertEqual(request.headers["Authorization"],"Bearer test-secret")
         payload=json.loads(request.data)
         self.assertEqual(payload["messages"][0]["role"],"developer")
+        self.assertEqual(payload["model"],"muse-wonder-1.0")
         self.assertEqual(payload["reasoning_effort"],"low")
         self.assertEqual(payload["max_completion_tokens"],8192)
         self.assertEqual(result["evidence_level"],"model_hypothesis")
         self.assertEqual(result["execution"],[])
         self.assertNotIn("test-secret",json.dumps(result))
+
+    @patch.dict(os.environ,{"META_API_KEY":"test-secret"},clear=True)
+    def test_unknown_model_is_rejected_before_network(self):
+        with self.assertRaisesRegex(ValueError,"supported Muse model"):
+            request_model({},"source",model="untrusted-model-id")
 
     @patch.dict(os.environ,{"META_API_KEY":"test","META_API_URL":"http://invalid"},clear=True)
     def test_non_https_endpoint_rejected(self):
@@ -245,6 +251,49 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(len(result['record']['stages']),5)
             self.assertNotIn('test-key',json.dumps(result))
             self.assertEqual(model.call_count,3)
+
+    @patch('openfix.workflow.verify_proposal')
+    @patch('openfix.workflow.request_model')
+    def test_progressive_candidate_finalizes_as_linked_workflow(self,model,verify):
+        with tempfile.TemporaryDirectory() as tmp:
+            store=EvidenceStore(tmp)
+            intake_record={"kind":"intake","status":"intake_only","issue_url":"https://github.com/facebookresearch/sam3/issues/585",
+                           "revision":"f1647e8d0c1d280991f4d1b7d974c2704537fe66","candidate_policy":{"status":"provisional"}}
+            intake_run=store.create(intake_record)
+            diagnosis=store.create({"kind":"model_diagnose","status":"proposal_ready","proposal":{},"investigation_id":intake_run["id"]})
+            repair=store.create({"kind":"model_repair","status":"proposal_ready","proposal":{"unified_diff":"diff"},
+                                 "investigation_id":intake_run["id"],"parent_evidence_id":diagnosis["id"],
+                                 "issue_url":intake_record["issue_url"],"revision":intake_record["revision"],"model":"muse-spark-1.3"})
+            verification=store.create({"kind":"model_verification","status":"conditional_local_pass","parent_evidence_id":repair["id"],
+                                       "test_results":{"status":"conditional_local_pass","fixture_count":32,"passed_fixtures":32,
+                                                       "no_crowd_invariants":{"passed":500,"total":500}},
+                                       "execution":{"exit_code":0,"termination":"exited","isolation":"docker_no_network"}})
+            verify.return_value=verification
+            model.return_value={"kind":"model_review","status":"proposal_ready","proposal":{"verdict":"conditional"},"execution":[]}
+            result=finalize_candidate(store,repair["id"],api_key="test-key",model="muse-spark-1.3")
+            self.assertEqual(result["record"]["status"],"conditional_local_pass")
+            self.assertEqual([stage["stage"] for stage in result["record"]["stages"]],
+                             ["issue_intake","meta_diagnosis","meta_repair","candidate_verification","meta_challenge"])
+            self.assertEqual(model.call_args.kwargs["model"],"muse-spark-1.3")
+            self.assertEqual(model.call_args.kwargs["execution"]["verification"]["executed_checks"]["passed_fixtures"],32)
+
+    @patch('openfix.workflow.verify_proposal',side_effect=ValueError('unsafe patch'))
+    @patch('openfix.workflow.request_model')
+    def test_progressive_rejected_patch_still_records_review(self,model,_verify):
+        with tempfile.TemporaryDirectory() as tmp:
+            store=EvidenceStore(tmp)
+            intake=store.create({"kind":"intake","status":"intake_only","issue_url":"https://github.com/facebookresearch/sam3/issues/585",
+                                 "revision":"f1647e8d0c1d280991f4d1b7d974c2704537fe66","candidate_policy":{"status":"provisional"}})
+            diagnosis=store.create({"kind":"model_diagnose","status":"proposal_ready","proposal":{},"investigation_id":intake["id"]})
+            repair=store.create({"kind":"model_repair","status":"proposal_ready","proposal":{"unified_diff":"unsafe"},
+                                 "investigation_id":intake["id"],"parent_evidence_id":diagnosis["id"],
+                                 "issue_url":"https://github.com/facebookresearch/sam3/issues/585",
+                                 "revision":"f1647e8d0c1d280991f4d1b7d974c2704537fe66","model":"muse-spark-1.3"})
+            model.return_value={"kind":"model_review","status":"proposal_ready","proposal":{"verdict":"rejected"},"execution":[]}
+            result=finalize_candidate(store,repair["id"],api_key="test-key")
+            self.assertEqual(result["record"]["status"],"proposal_rejected")
+            verification_id=result["record"]["stages"][3]["evidence_id"]
+            self.assertEqual(store.read(verification_id)["record"]["reason"],"unsafe patch")
 
 
 if __name__=="__main__":
