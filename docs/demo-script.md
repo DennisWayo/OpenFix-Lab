@@ -2,7 +2,7 @@
 
 Problem statement: **Push the Frontier**. Competition track: **Indie Developer**.
 
-Before recording, launch on a host with network access, a valid Meta API key, and Docker. Build `openfix-runner:local`, run the Meta workflow, and inspect its recorded result. If the model candidate fails or verification is blocked, disclose that outcome. The built-in candidate must not be presented as Meta-generated. The current exported HTML report is preparation material; the video has not yet been recorded.
+Before recording, launch on the validated Mac Studio with a valid Meta API key, run the Meta workflow, and inspect its recorded result. The Docker runner and browser interface have already passed build-host checks. If the model candidate fails or verification is blocked, disclose that outcome. The built-in candidate must not be presented as Meta-generated. The current exported HTML report is preparation material; the video has not yet been recorded.
 
 | Time | Screen | Narration |
 |---|---|---|
@@ -16,4 +16,4 @@ Before recording, launch on a host with network access, a valid Meta API key, an
 
 Label footage from earlier executions “recorded run” and show the real evidence ID. Trim network waits without suggesting instantaneous execution. State exact results from the recorded Meta candidate; the built-in 32/500 results cannot substitute for them.
 
-Remaining: run real Meta and Docker steps; inspect the browser interface; create the public repository with attribution; record/upload the accessible three-minute video; submit by **November 5, 2026, 10:00 AM Malaysia time**.
+Remaining: wait for Meta credits, add a payment method only when ready to make API calls, run and retain the real Meta workflow, record/upload the accessible three-minute video, and submit by **November 5, 2026, 10:00 AM Malaysia time**.
