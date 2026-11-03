@@ -114,7 +114,10 @@ def docker_run(repository, revision, command, image, timeout=60, overlays=None):
     if image_info["exit_code"] != 0:
         raise RuntimeError("The specified container image is not installed. Build or pull it explicitly before running.")
     name = "openfix-" + uuid.uuid4().hex[:16]
-    with tempfile.TemporaryDirectory(prefix="openfix-snapshot-") as tmp:
+    # Stage beside the repository so macOS container runtimes can bind-mount
+    # the snapshot. Their default shared paths include /Users, but not the
+    # system temp directory under /private/var/folders.
+    with tempfile.TemporaryDirectory(prefix=".openfix-snapshot-", dir=repo.parent) as tmp:
         tmp = Path(tmp)
         archive = tmp / "snapshot.tar"
         archived = capture(["git","-C",str(repo),"archive","--format=tar",f"--output={archive}",revision], timeout=20, max_bytes=4000)
