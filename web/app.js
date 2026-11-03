@@ -1,4 +1,4 @@
-let state={token:'',run:null,integrity:null,mode:'bbox',tab:'results',busy:false,execution:null,supporting:{},wizard:{intake:null,diagnosis:null,repair:null,model:'muse-spark-1.3'}};
+let state={token:'',run:null,integrity:null,mode:'bbox',tab:'results',busy:false,execution:null,supporting:{},nextActionText:'',wizard:{intake:null,diagnosis:null,repair:null,model:'muse-spark-1.3'}};
 const $=id=>document.getElementById(id);
 let noticeTimer=null;
 let museProgressTimer=null;
@@ -32,7 +32,7 @@ function label(value){return String(value||'').replaceAll('_',' ').replace(/^./,
 function isPass(status){return ['conditional_local_pass','passed','proposal_ready','intake_only'].includes(status);}
 function download(name,value,type='text/plain'){const anchor=document.createElement('a');anchor.href=URL.createObjectURL(new Blob([value],{type}));anchor.download=name;anchor.click();setTimeout(()=>URL.revokeObjectURL(anchor.href),1000);}
 function openStep(number){
-  for(const index of [1,2,3]){const step=$('step-'+index);if(index<=number)step.hidden=false;step.open=index===number;}
+  for(const index of [1,2,3,4]){const step=$('step-'+index);if(index<=number)step.hidden=false;step.open=index===number;}
   $('step-'+number).scrollIntoView({behavior:'smooth',block:'start'});
 }
 function setStepStatus(number,value,kind=''){text(`step-${number}-status`,value);$(`step-${number}-status`).className='step-state '+kind;}
@@ -94,10 +94,13 @@ function patchFigures(diff){
 }
 async function copyProposal(){
   const value=$('proposal-view').textContent;if(!value)return;
+  await copyText(value);
+  const button=$('copy-proposal');button.firstChild.textContent='Copied ';setTimeout(()=>{button.firstChild.textContent='Copy patch ';},1600);notice('Candidate patch copied.');
+}
+async function copyText(value){
   try{await navigator.clipboard.writeText(value);}catch{
     const area=document.createElement('textarea');area.value=value;area.style.position='fixed';area.style.opacity='0';document.body.append(area);area.select();document.execCommand('copy');area.remove();
   }
-  const button=$('copy-proposal');button.firstChild.textContent='Copied ';setTimeout(()=>{button.firstChild.textContent='Copy patch ';},1600);notice('Candidate patch copied.');
 }
 
 async function history(){
@@ -146,6 +149,31 @@ function renderOutcome(record,executed){
   text('outcome-badge',passed?'CONDITIONAL PASS':label(record.status||'RECORDED'));
   $('outcome-card').classList.toggle('attention',!passed);
 }
+function renderNextAction(record,executed){
+  const policy=record.policy||{};const verificationPassed=['conditional_local_pass','passed'].includes(record.status)||executed.status==='conditional_local_pass';
+  const status=record.status||executed.status||'recorded';let title,copy,badge,decision,destination,buttonLabel,tone='review';
+  if(verificationPassed&&policy.maintainer_endorsed!==true){
+    title='Ask the maintainer to confirm the intended policy';copy='The candidate passed the reviewed execution scope, but the behavior policy is still provisional. Share the evidence and request guidance before preparing an upstream contribution.';badge='GUIDANCE NEEDED';decision='MAINTAINER REVIEW';destination='RERUN OR PR';buttonLabel='Copy maintainer review request';tone='guidance';
+  }else if(verificationPassed){
+    title='Package the verified candidate for human contribution review';copy='The candidate passed the recorded checks and its policy is endorsed. Export the patch and evidence, then let a human prepare and review the upstream contribution.';badge='CONTRIBUTION READY';decision='PACKAGE EVIDENCE';destination='DRAFT PR';buttonLabel='Copy contribution summary';tone='ready';
+  }else if(record.kind==='intake'){
+    title='Continue from issue context to a candidate repair';copy='The issue and source context are recorded, but there is no repair hypothesis yet. Choose a Muse model, generate a focused candidate, and keep it labeled as unverified until execution.';badge='CANDIDATE NEEDED';decision='ASK MUSE';destination='VERIFY PATCH';buttonLabel='Copy intake brief';tone='review';
+  }else if(['model_diagnose','model_repair','model_review'].includes(record.kind)){
+    title='Execute the model hypothesis before acting on it';copy='This record contains model reasoning or a proposed patch, not behavioral proof. Run the exact candidate in the isolated verification gate before discussing an upstream contribution.';badge='EXECUTION REQUIRED';decision='RUN DOCKER';destination='REVIEW EVIDENCE';buttonLabel='Copy verification brief';tone='review';
+  }else if(status==='verification_blocked'){
+    title='Restore the verification environment and run the same candidate again';copy='The candidate was not disproven, but execution could not complete. Preserve the patch, repair the Docker environment, and rerun before making any code claim.';badge='EXECUTION BLOCKED';decision='RESTORE DOCKER';destination='RERUN CHECKS';buttonLabel='Copy blocked-run brief';tone='blocked';
+  }else if(status==='review_incomplete'){
+    title='Complete the evidence challenge before contributing';copy='Execution produced a result, but the final Muse challenge did not complete. Retry the review so unsupported claims and missing checks remain visible to the human reviewer.';badge='REVIEW INCOMPLETE';decision='RETRY CHALLENGE';destination='COMPLETE REVIEW';buttonLabel='Copy incomplete-review brief';tone='blocked';
+  }else{
+    title='Revise the candidate using the failed execution evidence';copy='The recorded checks do not support this repair. Give the failure evidence back to the repair workflow, generate a narrower candidate, and verify it again.';badge='REVISION NEEDED';decision='REVISE CANDIDATE';destination='RUN AGAIN';buttonLabel='Copy failure brief';tone='failed';
+  }
+  text('next-action-title',title);text('next-action-copy',copy);text('next-action-badge',badge);text('next-route-outcome',label(status).toUpperCase());text('next-route-decision',decision);text('next-route-destination',destination);text('copy-next-action',buttonLabel+' ⎘');
+  $('next-action-card').className='next-action-card '+tone;$('copy-next-action').dataset.label=buttonLabel+' ⎘';
+  const fixtureSummary=executed.fixture_count?`${executed.passed_fixtures}/${executed.fixture_count} geometry fixtures; ${executed.no_crowd_invariants?.passed??'—'}/${executed.no_crowd_invariants?.total??'—'} compatibility checks.`:'See the attached evidence record for the executed scope.';
+  state.nextActionText=`OpenFix review brief\n\nIssue: ${record.issue_url||'Recorded investigation'}\nPinned revision: ${record.revision||'Not recorded'}\nOutcome: ${label(status)}\nExecuted scope: ${fixtureSummary}\n\nRecommended next move: ${title}.\n${copy}\n\nEvidence record: ${state.run?.id||'Exported record'}${policy.review_question?`\nMaintainer discussion: ${policy.review_question}`:''}`;
+  const discussion=$('open-maintainer-discussion');discussion.hidden=true;try{const url=new URL(policy.review_question);if(url.protocol==='https:'){discussion.href=url.href;discussion.hidden=false;}}catch{}
+  $('step-4').hidden=false;setStepStatus(4,badge,tone==='ready'?'complete':'attention');
+}
 function table(){
   const record=executionRecord();$('fixture-table').replaceChildren();
   for(const item of (record.results||[]).filter(result=>result.mode===state.mode)){
@@ -184,7 +212,7 @@ async function show(payload){
   let diff=await artifactText(state.run);if(!diff)diff=await artifactText(state.supporting.repair);
   text('patch-view',diff||'No candidate patch in this evidence record.');
   text('patch-hint',record.kind==='meta_workflow'?'Muse-generated candidate patch executed by the recorded Docker verification. The policy remains provisional.':'Patch attached to this evidence record; execution status is shown above.');
-  renderOutcome(record,executed);renderJourney(record);table();setTab('results');
+  renderOutcome(record,executed);renderJourney(record);table();renderNextAction(record,executed);setTab('results');
   document.querySelectorAll('.history-item').forEach(item=>item.classList.toggle('active',item.dataset.runId===state.run.id));
 }
 
@@ -232,6 +260,10 @@ $('verify-candidate').onclick=()=>task('Executing the candidate in isolated Dock
     $('api-key').value='';await show(payload);finishVerificationProgress();await history();notice('Verification and challenge complete. Review what passed and what remains uncertain.');
   }catch(error){setStepStatus(3,'TRY AGAIN','attention');failVerificationProgress(error.message);throw error;}
 });
+$('continue-next').onclick=()=>openStep(4);
+$('copy-next-action').onclick=async()=>{if(!state.nextActionText)return;await copyText(state.nextActionText);const button=$('copy-next-action');button.textContent='Copied ✓';setTimeout(()=>{button.textContent=button.dataset.label;},1600);notice('Review brief copied.');};
+$('next-download-patch').onclick=()=>$('download-patch').click();
+$('next-download-evidence').onclick=()=>$('download-record').click();
 
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>setTab(button.dataset.tab));
 document.querySelectorAll('[data-mode]').forEach(button=>button.onclick=()=>{state.mode=button.dataset.mode;document.querySelectorAll('[data-mode]').forEach(item=>item.classList.toggle('selected',item===button));table();});

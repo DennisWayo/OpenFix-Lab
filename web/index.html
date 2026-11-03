@@ -101,8 +101,21 @@
           <div class="tab-panel panel inner-panel" id="tab-patch" hidden><div class="section-label"><h2>A focused change</h2><button id="download-patch">Download diff ↓</button></div><p class="hint" id="patch-hint">Candidate patch under the provisional policy.</p><pre id="patch-view"></pre></div>
           <div class="tab-panel panel inner-panel" id="tab-meta" hidden><div class="section-label"><h2>Muse challenge</h2><span class="tag" id="model-name">Muse</span></div><p>The final model call looks for unsupported claims and additional checks. Execution—not model agreement—provides the behavioral evidence.</p><pre id="model-view">No model challenge is attached to this view.</pre></div>
           <div class="tab-panel panel inner-panel" id="tab-evidence" hidden><div class="section-label"><h2>Execution, provenance &amp; limits</h2><button id="download-record">Download JSON ↓</button></div><ul id="limitations"></ul><pre id="evidence-view"></pre></div>
-          <button id="reset-workflow" class="reset-button">Start another investigation</button>
+          <div class="result-actions"><button class="primary" id="continue-next">Continue to next action <span>→</span></button></div>
         </section>
+      </div>
+    </details>
+
+    <details class="wizard-step panel" id="step-4" hidden>
+      <summary><span class="step-number">04</span><span class="step-heading"><strong>What next?</strong><small>Use the recorded outcome to request guidance, prepare a contribution, or revise safely.</small></span><span class="step-state" id="step-4-status">WAITING</span></summary>
+      <div class="step-body">
+        <div class="next-action-card" id="next-action-card">
+          <div><span class="eyebrow">RECOMMENDED NEXT MOVE</span><h2 id="next-action-title">Review the recorded outcome</h2><p id="next-action-copy">OpenFix will recommend the safest action supported by the evidence.</p></div>
+          <span class="next-action-badge" id="next-action-badge">HUMAN DECISION</span>
+        </div>
+        <div class="next-route" aria-label="Recommended evidence route"><div><span>RECORDED OUTCOME</span><strong id="next-route-outcome">—</strong></div><b>→</b><div><span>HUMAN DECISION</span><strong id="next-route-decision">—</strong></div><b>→</b><div><span>SAFE DESTINATION</span><strong id="next-route-destination">—</strong></div></div>
+        <div class="next-actions"><button class="primary" id="copy-next-action">Copy review brief <span>⎘</span></button><a class="button-link" id="open-maintainer-discussion" target="_blank" rel="noopener" hidden>Open maintainer discussion <span>↗</span></a><button id="next-download-patch">Download patch ↓</button><button id="next-download-evidence">Export evidence ↓</button><button id="reset-workflow">Start another investigation</button></div>
+        <p class="next-guardrail"><span>◇</span> Nothing is submitted automatically. A human reviews the evidence and chooses whether to ask, revise, rerun, or contribute.</p>
       </div>
     </details>
   </section>
