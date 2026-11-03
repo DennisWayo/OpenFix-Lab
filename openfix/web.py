@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+from socketserver import TCPServer
 import threading
 from urllib.parse import parse_qs, urlparse
 
@@ -12,6 +13,18 @@ from .model import configuration, request_model
 from .runner import bundled_demo, docker_available
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+class LoopbackThreadingHTTPServer(ThreadingHTTPServer):
+    """HTTP server that avoids a reverse-DNS lookup during local startup."""
+
+    def server_bind(self):
+        # HTTPServer.server_bind() calls socket.getfqdn(), which can block on
+        # machines whose reverse-DNS resolver is unavailable. TCPServer's bind
+        # is sufficient because OpenFix always binds to an explicit loopback IP.
+        TCPServer.server_bind(self)
+        self.server_name = "localhost"
+        self.server_port = self.server_address[1]
 
 
 def handler_class(root=None, port=8765):
@@ -162,7 +175,7 @@ def handler_class(root=None, port=8765):
 
 def serve(root=None, port=8765):
     Handler = handler_class(root, port)
-    server = ThreadingHTTPServer(("127.0.0.1",port), Handler)
+    server = LoopbackThreadingHTTPServer(("127.0.0.1",port), Handler)
     print(f"OpenFix Lab: http://127.0.0.1:{port}", flush=True)
     print("Only reviewed bundled fixtures run on the host. Repository execution requires Docker.",flush=True)
     try:

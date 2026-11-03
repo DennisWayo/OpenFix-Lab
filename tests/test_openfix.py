@@ -15,7 +15,7 @@ from openfix.model import parse_object, request_model
 from openfix.report import export_report
 from openfix.runner import capture, docker_run
 from openfix.verification import stage_patch
-from openfix.web import handler_class
+from openfix.web import handler_class, LoopbackThreadingHTTPServer
 from openfix.workflow import investigate
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -155,6 +155,15 @@ class HTTPTests(unittest.TestCase):
         getattr(handler,'do_'+method)()
         header,body=handler.wfile.getvalue().split(b'\r\n\r\n',1)
         return int(header.split(b' ')[1]),json.loads(body)
+
+    @patch("openfix.web.TCPServer.server_bind")
+    def test_local_server_bind_skips_reverse_dns(self, bind):
+        server=LoopbackThreadingHTTPServer.__new__(LoopbackThreadingHTTPServer)
+        server.server_address=("127.0.0.1",8765)
+        server.server_bind()
+        bind.assert_called_once_with(server)
+        self.assertEqual(server.server_name,"localhost")
+        self.assertEqual(server.server_port,8765)
 
     def test_bundled_intake_and_integrity_routes(self):
         status,settings=self.request('GET','/api/status')
