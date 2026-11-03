@@ -181,6 +181,17 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.request('GET','/api/status',host='evil.example')[0],403)
         self.assertEqual(self.request('GET','/api/status',origin='https://evil.example')[0],403)
 
+    def test_configured_https_proxy_origin_is_allowed(self):
+        origin='https://openfix.example.ts.net'
+        with patch.dict(os.environ,{'OPENFIX_TRUSTED_ORIGINS':origin}):
+            self.handler=handler_class(self.tmp.name)
+        status,settings=self.request('GET','/api/status',host='openfix.example.ts.net')
+        self.assertEqual(status,200)
+        status,_=self.request('POST','/api/demo',{},settings['token'],
+                              host='openfix.example.ts.net',origin=origin)
+        self.assertEqual(status,200)
+        self.assertEqual(self.request('GET','/api/status',host='evil.example')[0],403)
+
     def test_post_without_token_is_blocked(self):
         self.assertEqual(self.request('POST','/api/demo',{})[0],403)
 

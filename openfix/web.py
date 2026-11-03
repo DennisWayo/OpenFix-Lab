@@ -31,6 +31,19 @@ def handler_class(root=None, port=8765):
     store = EvidenceStore(root or ROOT / "artifacts")
     token = secrets.token_urlsafe(32)
     work_lock = threading.Lock()
+    trusted_origins = {f"http://127.0.0.1:{port}", f"http://localhost:{port}"}
+    for raw_origin in os.environ.get("OPENFIX_TRUSTED_ORIGINS", "").split(","):
+        raw_origin = raw_origin.strip().rstrip("/")
+        if not raw_origin:
+            continue
+        parsed_origin = urlparse(raw_origin)
+        if (parsed_origin.scheme != "https" or not parsed_origin.netloc
+                or parsed_origin.path or parsed_origin.params
+                or parsed_origin.query or parsed_origin.fragment
+                or parsed_origin.username or parsed_origin.password):
+            raise ValueError("OPENFIX_TRUSTED_ORIGINS accepts comma-separated HTTPS origins only")
+        trusted_origins.add(raw_origin)
+    trusted_hosts = {urlparse(origin).netloc for origin in trusted_origins}
 
     class Handler(BaseHTTPRequestHandler):
         server_version = "OpenFix/0.2"
@@ -52,11 +65,11 @@ def handler_class(root=None, port=8765):
 
         def local_request(self):
             host = self.headers.get("Host","")
-            if host not in (f"127.0.0.1:{port}", f"localhost:{port}"):
-                self.send(403,{"error":"This application accepts loopback requests only"})
+            if host not in trusted_hosts:
+                self.send(403,{"error":"This application accepts configured trusted hosts only"})
                 return False
             origin = self.headers.get("Origin")
-            if origin and origin not in (f"http://127.0.0.1:{port}",f"http://localhost:{port}"):
+            if origin and origin not in trusted_origins:
                 self.send(403,{"error":"Cross-origin requests are blocked"})
                 return False
             return True
