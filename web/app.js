@@ -1,7 +1,11 @@
 let state={token:'',run:null,integrity:null,mode:'bbox',tab:'results',busy:false,execution:null,supporting:{},wizard:{intake:null,diagnosis:null,repair:null,model:'muse-spark-1.3'}};
 const $=id=>document.getElementById(id);
+let noticeTimer=null;
 function text(id,value){$(id).textContent=value??'';}
-function notice(message,error=false){text('notice',message);$('notice').hidden=false;$('notice').classList.toggle('error',error);}
+function notice(message,error=false){
+  clearTimeout(noticeTimer);text('notice',message);$('notice').hidden=false;$('notice').classList.toggle('error',error);
+  noticeTimer=setTimeout(()=>{$('notice').hidden=true;},error?8000:4200);
+}
 async function api(path,data){
   if(window.OPENFIX_REPORT){
     if(data)throw new Error('This is an exported execution report. Start the local OpenFix app for new runs.');
@@ -125,7 +129,9 @@ $('intake-form').onsubmit=event=>{event.preventDefault();task('Inspecting the is
   const payload=await api('/api/intake',{issue_url:$('issue-url').value.trim(),source_paths:$('source-paths').value.split('\n').map(value=>value.trim()).filter(Boolean),refresh:$('fresh-intake').checked});
   state.wizard.intake=payload.run;renderIssue(payload.run.record);await history();notice('Issue inspected. Review the context, then choose whether to ask Muse for a repair.');$('solve-dialog').showModal();
 });};
-$('confirm-solve').onclick=()=>{setStepStatus(1,'ISSUE READY','complete');$('step-2').hidden=false;setTimeout(()=>openStep(2),0);};
+function advanceToMuse(){setStepStatus(1,'ISSUE READY','complete');$('step-2').hidden=false;setTimeout(()=>openStep(2),0);}
+$('confirm-solve').onclick=advanceToMuse;
+$('continue-muse').onclick=advanceToMuse;
 
 const modelDescriptions={
   'muse-spark-1.3':'Latest Muse Spark for agentic coding workflows. Recommended; Standard mode.',
