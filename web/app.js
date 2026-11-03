@@ -54,6 +54,22 @@ function finishMuseProgress(){
 function failMuseProgress(message){
   clearInterval(museProgressTimer);const progress=$('muse-progress');progress.hidden=false;progress.classList.add('error');text('muse-progress-title','Muse request stopped');text('muse-progress-copy',message||'Review the message and try again.');
 }
+function patchFigures(diff){
+  const files=new Set();let additions=0;let removals=0;
+  for(const line of String(diff||'').split('\n')){
+    if(line.startsWith('+++ ')&&line.slice(4).trim()!=='/dev/null')files.add(line.slice(4).trim().replace(/^b\//,''));
+    else if(line.startsWith('+'))additions++;
+    if(line.startsWith('-')&&!line.startsWith('--- '))removals++;
+  }
+  return {files:files.size,additions,removals};
+}
+async function copyProposal(){
+  const value=$('proposal-view').textContent;if(!value)return;
+  try{await navigator.clipboard.writeText(value);}catch{
+    const area=document.createElement('textarea');area.value=value;area.style.position='fixed';area.style.opacity='0';document.body.append(area);area.select();document.execCommand('copy');area.remove();
+  }
+  const button=$('copy-proposal');button.firstChild.textContent='Copied ';setTimeout(()=>{button.firstChild.textContent='Copy patch ';},1600);notice('Candidate patch copied.');
+}
 
 async function history(){
   const {runs}=await api('/api/runs');
@@ -176,9 +192,11 @@ $('generate-candidate').onclick=()=>task('Muse is diagnosing the issue and gener
     state.wizard.repair=repair.run;
     const modelName=$('model-select').selectedOptions[0].textContent.split(' · ')[0];
     text('diagnosis-summary',`${modelName} identified a candidate contract violation.`);text('repair-summary','Structured patch ready · not executed yet');
-    text('proposal-view',repair.run.record.proposal.unified_diff);$('candidate-preview').hidden=false;setStepStatus(2,'CANDIDATE READY','complete');finishMuseProgress();await history();notice('Candidate generated. Inspect the patch, then continue to the execution gate.');
+    const diff=repair.run.record.proposal.unified_diff;const figures=patchFigures(diff);
+    text('proposal-view',diff);text('candidate-files',figures.files);text('candidate-additions',`+${figures.additions}`);text('candidate-removals',`−${figures.removals}`);$('candidate-preview').hidden=false;setStepStatus(2,'CANDIDATE READY','complete');finishMuseProgress();await history();notice('Candidate generated. Inspect the patch, then continue to the execution gate.');
   }catch(error){setStepStatus(2,'TRY AGAIN','attention');failMuseProgress(error.message);throw error;}
 });
+$('copy-proposal').onclick=copyProposal;
 $('continue-verify').onclick=()=>{setStepStatus(2,'CANDIDATE READY','complete');$('step-3').hidden=false;openStep(3);};
 $('verify-candidate').onclick=()=>task('Executing the candidate in isolated Docker, then asking Muse to challenge the evidence…',async()=>{
   if(!state.wizard.repair)throw new Error('Complete Step 02 before verification.');

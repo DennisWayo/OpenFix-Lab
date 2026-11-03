@@ -61,9 +61,11 @@
           <p class="progress-note">Muse requests can take a minute. Keep this page open.</p>
         </div>
         <div class="candidate-preview" id="candidate-preview" hidden>
-          <div class="candidate-check"><span>✓</span><div><strong>Structured diagnosis ready</strong><small id="diagnosis-summary">Failure and contract recorded</small></div></div>
-          <div class="candidate-check"><span>✓</span><div><strong>Candidate patch generated</strong><small id="repair-summary">Not executed yet</small></div></div>
-          <details><summary>Inspect proposed patch</summary><pre id="proposal-view"></pre></details>
+          <div class="candidate-overview">
+            <div><div class="candidate-check"><span>✓</span><div><strong>Structured diagnosis ready</strong><small id="diagnosis-summary">Failure and contract recorded</small></div></div><div class="candidate-check"><span>✓</span><div><strong>Candidate patch generated</strong><small id="repair-summary">Not executed yet</small></div></div></div>
+            <div class="candidate-figures" aria-label="Candidate patch figures"><div><strong id="candidate-files">—</strong><small>FILES CHANGED</small></div><div><strong id="candidate-additions">—</strong><small>ADDITIONS</small></div><div><strong id="candidate-removals">—</strong><small>REMOVALS</small></div><div><strong>NOT RUN</strong><small>EXECUTION</small></div></div>
+          </div>
+          <details><summary>Inspect proposed patch</summary><div class="proposal-frame"><button class="copy-patch" id="copy-proposal" type="button">Copy patch <span>⎘</span></button><pre id="proposal-view"></pre></div></details>
           <button class="primary" id="continue-verify">Continue to verification <span>→</span></button>
         </div>
       </div>

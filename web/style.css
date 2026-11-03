@@ -205,12 +205,23 @@ select:focus{outline:2px solid #8fae99;outline-offset:1px}
 @keyframes progress-spin{to{transform:rotate(360deg)}}
 @keyframes progress-slide{0%{transform:translateX(-110%)}50%{transform:translateX(165%)}100%{transform:translateX(-110%)}}
 .candidate-preview{margin-top:22px;padding:18px;border:1px solid #cddbcf;background:#f6faf5;border-radius:9px}
+.candidate-overview{display:grid;grid-template-columns:minmax(300px,1fr) minmax(460px,1.25fr);gap:28px;align-items:center}
 .candidate-check{display:flex;gap:10px;align-items:center;margin:5px 0 12px}
 .candidate-check>span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#dfeee2;color:var(--green);font-weight:700}
 .candidate-check strong,.candidate-check small{display:block}
 .candidate-check small{font-size:10px;color:var(--muted)}
+.candidate-figures{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #d7e2d7;border-radius:8px;background:#fff;overflow:hidden}
+.candidate-figures>div{min-width:0;padding:15px 12px;border-left:1px solid #e3e9e1}
+.candidate-figures>div:first-child{border-left:0}
+.candidate-figures strong,.candidate-figures small{display:block}
+.candidate-figures strong{color:var(--green);font:600 20px/1.2 ui-monospace,monospace;overflow-wrap:anywhere}
+.candidate-figures>div:last-child strong{font-size:11px;line-height:24px;color:#8a6424}
+.candidate-figures small{margin-top:4px;color:var(--muted);font:8px ui-monospace,monospace;letter-spacing:.7px}
 .candidate-preview details{margin:12px 0}
-.candidate-preview pre{max-height:280px}
+.proposal-frame{position:relative;margin-top:12px}
+.candidate-preview pre{max-height:280px;margin:0;padding-top:64px}
+.copy-patch{position:absolute;z-index:1;top:12px;left:12px;border-color:#607275;background:#24383c;color:#dce8df;font:10px ui-monospace,monospace;padding:7px 10px}
+.copy-patch:hover{background:#30484c}.copy-patch span{margin-left:5px;color:#9ec3ab}
 .verification-intro{display:flex;justify-content:space-between;align-items:center;gap:30px;border:1px solid #d2ddd1;background:#f8faf6;border-radius:9px;padding:22px}
 .verification-intro h2{font-size:22px;margin:4px 0}
 .verification-intro p{color:var(--muted);max-width:760px;margin-bottom:0}
@@ -227,7 +238,7 @@ dialog p{color:var(--muted);margin:10px auto 22px;max-width:410px}
 .dialog-actions{display:flex;justify-content:center;gap:10px}
 
 @media(max-width:900px){
-  .issue-preview,.model-grid{grid-template-columns:1fr}
+  .issue-preview,.model-grid,.candidate-overview{grid-template-columns:1fr}
   .verification-intro{align-items:flex-start;flex-direction:column}
 }
 @media(max-width:760px){
@@ -237,4 +248,5 @@ dialog p{color:var(--muted);margin:10px auto 22px;max-width:410px}
   .step-state{font-size:8px}
   .dialog-actions{flex-direction:column-reverse}
   .progress-stages{grid-template-columns:1fr}
+  .candidate-figures{grid-template-columns:1fr 1fr}.candidate-figures>div:nth-child(3){border-left:0;border-top:1px solid #e3e9e1}.candidate-figures>div:nth-child(4){border-top:1px solid #e3e9e1}
 }
