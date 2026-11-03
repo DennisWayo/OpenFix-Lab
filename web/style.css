@@ -225,6 +225,18 @@ select:focus{outline:2px solid #8fae99;outline-offset:1px}
 .verification-intro{display:flex;justify-content:space-between;align-items:center;gap:30px;border:1px solid #d2ddd1;background:#f8faf6;border-radius:9px;padding:22px}
 .verification-intro h2{font-size:22px;margin:4px 0}
 .verification-intro p{color:var(--muted);max-width:760px;margin-bottom:0}
+.verification-progress{margin-top:16px;padding:20px;border:1px solid #c8d8cb;border-radius:9px;background:#f7faf6}
+.verification-stages{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0;padding:0;list-style:none}
+.verification-stages li{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--muted)}
+.verification-stages li>span{display:grid;place-items:center;min-width:22px;height:22px;border-radius:50%;background:#edf1eb;font:10px ui-monospace,monospace}
+.verification-stages strong,.verification-stages small{display:block}.verification-stages strong{font-size:10px}.verification-stages small{font-size:8px}
+.verification-stages li.active{border-color:#92b5a0;color:var(--ink);box-shadow:inset 3px 0 var(--green)}
+.verification-stages li.active>span{background:var(--green);color:#fff}
+.verification-stages li.done{color:var(--green);border-color:#c7d9ca;background:#f5faf5}
+.verification-stages li.done>span{font-size:0;background:#dfeee2}.verification-stages li.done>span:after{content:'✓';font-size:11px}
+.verification-progress.complete .progress-orbit{animation:none;border-color:var(--green);position:relative}.verification-progress.complete .progress-orbit:after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:var(--green)}
+.verification-progress.complete .progress-track span{width:100%;animation:none}
+.verification-progress.error{border-color:#e6c7b9;background:#fff7f2}.verification-progress.error .progress-orbit{animation:none;border-color:#b76347}.verification-progress.error .progress-track{display:none}
 #result{margin-top:2px}
 .inner-panel{box-shadow:none}
 .reset-button{margin-top:18px}
@@ -239,6 +251,7 @@ dialog p{color:var(--muted);margin:10px auto 22px;max-width:410px}
 
 @media(max-width:900px){
   .issue-preview,.model-grid,.candidate-overview{grid-template-columns:1fr}
+  .verification-stages{grid-template-columns:1fr 1fr}
   .verification-intro{align-items:flex-start;flex-direction:column}
 }
 @media(max-width:760px){
@@ -248,5 +261,6 @@ dialog p{color:var(--muted);margin:10px auto 22px;max-width:410px}
   .step-state{font-size:8px}
   .dialog-actions{flex-direction:column-reverse}
   .progress-stages{grid-template-columns:1fr}
+  .verification-stages{grid-template-columns:1fr}
   .candidate-figures{grid-template-columns:1fr 1fr}.candidate-figures>div:nth-child(3){border-left:0;border-top:1px solid #e3e9e1}.candidate-figures>div:nth-child(4){border-top:1px solid #e3e9e1}
 }

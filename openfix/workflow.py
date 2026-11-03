@@ -87,7 +87,7 @@ def investigate(store, api_key=None, image="openfix-runner:local", model=None):
                                         "Model review is another model opinion; test execution provides the behavioral evidence."]})
 
 
-def finalize_candidate(store, repair_id, api_key=None, image="openfix-runner:local", model=None):
+def finalize_candidate(store, repair_id, api_key=None, image="openfix-runner:local", model=None, progress=None):
     """Verify one saved repair, challenge the evidence, and save a linked workflow."""
     if not (api_key or os.environ.get("META_API_KEY") or os.environ.get("MODEL_API_KEY")):
         raise ValueError("A Meta API key is required to challenge the verification evidence")
@@ -102,13 +102,17 @@ def finalize_candidate(store, repair_id, api_key=None, image="openfix-runner:loc
     investigation_record=investigation["record"]
     diagnosis_id=repair_record.get("parent_evidence_id")
     diagnosis=store.read(diagnosis_id) if diagnosis_id else None
+    if progress:
+        progress("preparing")
     try:
-        verification=verify_proposal(store,repair_id,image)
+        verification=verify_proposal(store,repair_id,image,progress=progress) if progress else verify_proposal(store,repair_id,image)
     except ValueError as exc:
         verification=store.create({"kind":"model_verification","status":"proposal_rejected",
                                    "reason":str(exc),"parent_evidence_id":repair_id,
                                    "investigation_id":investigation_id,
                                    "model":model or repair_record.get("model"),"execution":[]})
+    if progress:
+        progress("challenging")
     try:
         review_result=request_model(
             investigation_record,
@@ -127,6 +131,8 @@ def finalize_candidate(store, repair_id, api_key=None, image="openfix-runner:loc
                           "issue_url":investigation_record.get("issue_url"),
                           "revision":investigation_record.get("revision")})
     review=store.create(review_result)
+    if progress:
+        progress("recording")
     status=verification["record"]["status"]
     if not review["record"].get("proposal"):
         status="review_incomplete"

@@ -4,6 +4,10 @@ let noticeTimer=null;
 let museProgressTimer=null;
 let museProgressHideTimer=null;
 let museProgressStarted=0;
+let verificationClockTimer=null;
+let verificationPollTimer=null;
+let verificationHideTimer=null;
+let verificationStarted=0;
 function text(id,value){$(id).textContent=value??'';}
 function notice(message,error=false){
   clearTimeout(noticeTimer);text('notice',message);$('notice').hidden=false;$('notice').classList.toggle('error',error);
@@ -53,6 +57,31 @@ function finishMuseProgress(){
 }
 function failMuseProgress(message){
   clearInterval(museProgressTimer);const progress=$('muse-progress');progress.hidden=false;progress.classList.add('error');text('muse-progress-title','Muse request stopped');text('muse-progress-copy',message||'Review the message and try again.');
+}
+const verificationPhases=['preparing','docker','challenging','recording'];
+const verificationMessages={
+  preparing:['Preparing the candidate','Validating scope and applying the exact proposed patch.'],
+  docker:['Running isolated Docker checks','Executing geometry fixtures without network access.'],
+  challenging:['Muse is challenging the evidence','Looking for unsupported claims and missing checks.'],
+  recording:['Sealing the evidence record','Hashing artifacts and linking every workflow stage.'],
+  complete:['Verification complete','The recorded results are ready for review.']
+};
+function updateVerificationClock(){text('verification-progress-time',progressTime(Math.floor((Date.now()-verificationStarted)/1000)));}
+function setVerificationProgress(phase){
+  const progress=$('verification-progress');progress.hidden=false;progress.classList.remove('error','complete');
+  const index=verificationPhases.indexOf(phase);
+  verificationPhases.forEach((name,position)=>{$(`verify-stage-${name}`).className=phase==='complete'||position<index?'done':position===index?'active':'';});
+  const message=verificationMessages[phase]||verificationMessages.preparing;text('verification-progress-title',message[0]);text('verification-progress-copy',message[1]);
+  if(phase==='complete')progress.classList.add('complete');
+}
+function startVerificationProgress(progressId){
+  clearInterval(verificationClockTimer);clearInterval(verificationPollTimer);clearTimeout(verificationHideTimer);verificationStarted=Date.now();setVerificationProgress('preparing');updateVerificationClock();
+  verificationClockTimer=setInterval(updateVerificationClock,1000);
+  verificationPollTimer=setInterval(async()=>{try{const status=await api('/api/progress?id='+encodeURIComponent(progressId));if(status.phase&&!['complete','failed'].includes(status.phase))setVerificationProgress(status.phase);}catch{}},700);
+}
+function finishVerificationProgress(){clearInterval(verificationClockTimer);clearInterval(verificationPollTimer);updateVerificationClock();setVerificationProgress('complete');verificationHideTimer=setTimeout(()=>{$('verification-progress').hidden=true;},1800);}
+function failVerificationProgress(message){
+  clearInterval(verificationClockTimer);clearInterval(verificationPollTimer);clearTimeout(verificationHideTimer);const progress=$('verification-progress');progress.hidden=false;progress.classList.add('error');text('verification-progress-title','Verification stopped');text('verification-progress-copy',message||'Review the message and try again.');
 }
 function patchFigures(diff){
   const files=new Set();let additions=0;let removals=0;
@@ -200,9 +229,11 @@ $('copy-proposal').onclick=copyProposal;
 $('continue-verify').onclick=()=>{setStepStatus(2,'CANDIDATE READY','complete');$('step-3').hidden=false;openStep(3);};
 $('verify-candidate').onclick=()=>task('Executing the candidate in isolated Docker, then asking Muse to challenge the evidence…',async()=>{
   if(!state.wizard.repair)throw new Error('Complete Step 02 before verification.');
-  setStepStatus(3,'VERIFYING');
-  const payload=await api('/api/finalize',{repair_id:state.wizard.repair.id,api_key:$('api-key').value,model:state.wizard.model});
-  $('api-key').value='';await show(payload);await history();notice('Verification and challenge complete. Review what passed and what remains uncertain.');
+  setStepStatus(3,'VERIFYING');const progressId=globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(16).slice(2)}`;startVerificationProgress(progressId);
+  try{
+    const payload=await api('/api/finalize',{repair_id:state.wizard.repair.id,api_key:$('api-key').value,model:state.wizard.model,progress_id:progressId});
+    $('api-key').value='';await show(payload);finishVerificationProgress();await history();notice('Verification and challenge complete. Review what passed and what remains uncertain.');
+  }catch(error){setStepStatus(3,'TRY AGAIN','attention');failVerificationProgress(error.message);throw error;}
 });
 
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>setTab(button.dataset.tab));

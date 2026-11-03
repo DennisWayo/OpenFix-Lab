@@ -194,6 +194,8 @@ class HTTPTests(unittest.TestCase):
     def test_bundled_intake_and_integrity_routes(self):
         status,settings=self.request('GET','/api/status')
         self.assertEqual(status,200)
+        status,progress=self.request('GET','/api/progress?id=unknown')
+        self.assertEqual((status,progress),(200,{'phase':'waiting'}))
         status,result=self.request('POST','/api/intake',{'issue_url':'https://github.com/facebookresearch/sam3/issues/585'},settings['token'])
         self.assertEqual(status,200)
         self.assertTrue(result['integrity']['passed'])
@@ -268,10 +270,16 @@ class WorkflowTests(unittest.TestCase):
                                        "test_results":{"status":"conditional_local_pass","fixture_count":32,"passed_fixtures":32,
                                                        "no_crowd_invariants":{"passed":500,"total":500}},
                                        "execution":{"exit_code":0,"termination":"exited","isolation":"docker_no_network"}})
-            verify.return_value=verification
+            def verified(*args,progress=None,**kwargs):
+                if progress:
+                    progress("docker")
+                return verification
+            verify.side_effect=verified
             model.return_value={"kind":"model_review","status":"proposal_ready","proposal":{"verdict":"conditional"},"execution":[]}
-            result=finalize_candidate(store,repair["id"],api_key="test-key",model="muse-spark-1.3")
+            progress=[]
+            result=finalize_candidate(store,repair["id"],api_key="test-key",model="muse-spark-1.3",progress=progress.append)
             self.assertEqual(result["record"]["status"],"conditional_local_pass")
+            self.assertEqual(progress,["preparing","docker","challenging","recording"])
             self.assertEqual([stage["stage"] for stage in result["record"]["stages"]],
                              ["issue_intake","meta_diagnosis","meta_repair","candidate_verification","meta_challenge"])
             self.assertEqual(model.call_args.kwargs["model"],"muse-spark-1.3")

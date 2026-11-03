@@ -99,7 +99,7 @@ def stage_patch(diff, original):
     return candidate
 
 
-def verify_proposal(store, proposal_id, image="openfix-runner:local"):
+def verify_proposal(store, proposal_id, image="openfix-runner:local", progress=None):
     envelope=store.read(proposal_id)
     if not store.audit(proposal_id)["passed"]:
         raise ValueError("Proposal integrity failed")
@@ -116,6 +116,8 @@ def verify_proposal(store, proposal_id, image="openfix-runner:local"):
     diff=proposal["proposal"].get("unified_diff")
     applied_diff=normalize_hunk_counts(diff)
     candidate=stage_patch(diff,original)
+    if progress:
+        progress("docker")
     record={"kind":"model_verification","parent_evidence_id":proposal_id,"issue_url":proposal["issue_url"],
             "revision":proposal["revision"],"candidate_sha256":digest(candidate.encode()),
             "verification_scope":"SAM 3 evaluateImg methods and tiny geometry; provisional crowd policy",

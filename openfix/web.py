@@ -31,6 +31,7 @@ def handler_class(root=None, port=8765):
     store = EvidenceStore(root or ROOT / "artifacts")
     token = secrets.token_urlsafe(32)
     work_lock = threading.Lock()
+    progress_runs = {}
     trusted_origins = {f"http://127.0.0.1:{port}", f"http://localhost:{port}"}
     for raw_origin in os.environ.get("OPENFIX_TRUSTED_ORIGINS", "").split(","):
         raw_origin = raw_origin.strip().rstrip("/")
@@ -84,6 +85,9 @@ def handler_class(root=None, port=8765):
                     return self.send(200,{"token":token,"model":configuration(),"docker_available":docker_available(),"version":"0.3.0"})
                 if route == "/api/runs":
                     return self.send(200,{"runs":store.list()})
+                if route == "/api/progress":
+                    progress_id = parse_qs(parsed.query).get("id",[""])[0]
+                    return self.send(200,progress_runs.get(progress_id,{"phase":"waiting"}))
                 if route.startswith("/api/runs/"):
                     run_id = route.rsplit("/",1)[-1]
                     return self.send(200,{"run":store.read(run_id),"integrity":store.audit(run_id)})
@@ -131,9 +135,20 @@ def handler_class(root=None, port=8765):
                                       model=data.get("model") or None)
                 elif self.path == "/api/finalize":
                     from .workflow import finalize_candidate
-                    run = finalize_candidate(store,data.get("repair_id",""),api_key=data.get("api_key") or None,
-                                             image=os.environ.get("OPENFIX_DOCKER_IMAGE","openfix-runner:local"),
-                                             model=data.get("model") or None)
+                    progress_id = data.get("progress_id","")
+                    if not isinstance(progress_id,str) or len(progress_id)>80 or any(character not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-" for character in progress_id):
+                        raise ValueError("Invalid progress identifier")
+                    def report(phase):
+                        if progress_id:
+                            progress_runs[progress_id]={"phase":phase}
+                    try:
+                        run = finalize_candidate(store,data.get("repair_id",""),api_key=data.get("api_key") or None,
+                                                 image=os.environ.get("OPENFIX_DOCKER_IMAGE","openfix-runner:local"),
+                                                 model=data.get("model") or None,progress=report)
+                    except Exception:
+                        report("failed")
+                        raise
+                    report("complete")
                 elif self.path == "/api/intake":
                     from .__main__ import intake
                     from .github import ingest

@@ -75,6 +75,17 @@
       <summary><span class="step-number">03</span><span class="step-heading"><strong>Verify &amp; review</strong><small>Execute the exact patch in Docker, then challenge the evidence.</small></span><span class="step-state" id="step-3-status">WAITING</span></summary>
       <div class="step-body">
         <div class="verification-intro" id="verification-intro"><div><span class="eyebrow">EXECUTION GATE</span><h2>Meta proposed. Now the checks decide.</h2><p>The patch is restricted to the reviewed evaluator method, executed without network access, and followed by a fresh model challenge.</p></div><button class="primary" id="verify-candidate">Verify candidate &amp; challenge evidence <span>▶</span></button></div>
+        <div class="verification-progress" id="verification-progress" role="status" aria-live="polite" hidden>
+          <div class="progress-heading"><span class="progress-orbit" aria-hidden="true"></span><div><strong id="verification-progress-title">Preparing the candidate</strong><small id="verification-progress-copy">Validating and applying the exact proposed patch.</small></div><time id="verification-progress-time">00:00</time></div>
+          <div class="progress-track" aria-hidden="true"><span></span></div>
+          <ol class="verification-stages">
+            <li id="verify-stage-preparing"><span>1</span><div><strong>Prepare patch</strong><small>Validate scope and apply</small></div></li>
+            <li id="verify-stage-docker"><span>2</span><div><strong>Docker checks</strong><small>Run isolated fixtures</small></div></li>
+            <li id="verify-stage-challenging"><span>3</span><div><strong>Muse challenge</strong><small>Question the evidence</small></div></li>
+            <li id="verify-stage-recording"><span>4</span><div><strong>Seal evidence</strong><small>Hash and link records</small></div></li>
+          </ol>
+          <p class="progress-note">This page reports actual server phases. Docker and Muse response times can vary.</p>
+        </div>
 
         <section id="result" hidden>
           <div class="outcome-card" id="outcome-card"><div><span class="eyebrow" id="outcome-kicker">RECORDED OUTCOME</span><h2 id="outcome-title">Evidence loaded</h2><p id="outcome-copy"></p></div><span class="outcome-badge" id="outcome-badge">RECORDED</span></div>
