@@ -48,8 +48,7 @@ def normalize_hunk_counts(diff):
         index = end
     if not hunks:
         raise ValueError("Expected at least one unified diff hunk")
-    result = "\n".join(normalized)
-    return result + ("\n" if diff.endswith("\n") else "")
+    return "\n".join(normalized) + "\n"
 
 
 def stage_patch(diff, original):

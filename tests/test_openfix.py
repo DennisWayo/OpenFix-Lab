@@ -129,7 +129,7 @@ class CaseTests(unittest.TestCase):
 
     def test_incorrect_model_hunk_counts_are_safely_normalized(self):
         _,files=run_demo()
-        broken=re.sub(r'(@@ -\d+),\d+ (\+\d+),\d+',r'\1,1 \2,1',files['candidate.patch'])
+        broken=re.sub(r'(@@ -\d+),\d+ (\+\d+),\d+',r'\1,1 \2,1',files['candidate.patch']).rstrip('\n')
         self.assertEqual(stage_patch(broken,files['source.py']),files['candidate.py'])
 
     def test_patch_for_another_path_is_rejected(self):
