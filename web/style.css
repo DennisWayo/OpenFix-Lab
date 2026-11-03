@@ -12,11 +12,12 @@ button.primary:hover{background:#164e3e}
 .brand .muted{font-weight:400;color:#a9bdb2}
 .logo{width:36px;height:36px;border:1px solid #a9bc9b;border-radius:8px;display:grid;place-items:center;color:#d2e5b7;font:13px monospace;letter-spacing:-1px}
 .eyebrow{font:10px/1.6 ui-monospace,monospace;letter-spacing:1.5px;color:var(--muted);font-weight:600}
-.sidebar .eyebrow{color:#8ba299;margin-bottom:15px;font-size:9px}
+.sidebar .eyebrow{margin-bottom:15px;font-size:9px}
+.sidebar .eyebrow,.history-head>span{background:linear-gradient(90deg,#dce9ce 0%,#9ebdac 58%,#718f89 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
 .nav{padding:12px;border-radius:6px}
 .nav.active{background:#2b4240;color:#e5f1dc}
 .side-note{font-size:13px;color:#92a8a0;margin:28px 8px 42px;line-height:1.8}
-.history-head{font-size:9px;letter-spacing:1.5px;color:#92a8a0;display:flex;justify-content:space-between;align-items:center}
+.history-head{font-size:9px;letter-spacing:1.5px;display:flex;justify-content:space-between;align-items:center}
 .history-head button{background:none;color:#b9cec2;border:0;padding:4px}
 .history-item{position:relative;padding:12px 10px 12px 18px;margin:5px 0;font-size:12px;cursor:pointer;border-radius:6px;overflow-wrap:anywhere}
 .history-item:before{content:"";position:absolute;left:7px;top:18px;width:5px;height:5px;border-radius:50%;background:#c18a3d}
@@ -28,7 +29,10 @@ button.primary:hover{background:#164e3e}
 .live-dot{height:6px;width:6px;background:#b0d291;border-radius:50%}
 .version{margin-left:auto;color:#7e9990}
 main{margin-left:238px;padding:40px 48px 20px;max-width:1620px}
-header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:28px}
+header{position:relative;display:flex;justify-content:space-between;gap:20px;align-items:flex-start;min-height:210px;margin-bottom:28px;padding:32px 34px;border:1px solid #dfe5db;border-radius:12px;overflow:hidden;background-image:linear-gradient(90deg,rgba(244,245,240,.08) 0%,rgba(244,245,240,.03) 58%,rgba(244,245,240,.2) 100%),url('/assets/evidence-hero.jpg');background-size:cover;background-position:center right;box-shadow:0 8px 30px #173f2c0c}
+header:after{content:"";position:absolute;inset:auto 0 0;height:3px;background:linear-gradient(90deg,#1d6550 0%,#82a78f 38%,transparent 82%);opacity:.55}
+header>div,header>.tag{position:relative;z-index:1}
+header .eyebrow{background:linear-gradient(90deg,#365f54,#78958a);-webkit-background-clip:text;background-clip:text;color:transparent}
 h1{font-size:36px;line-height:1.15;letter-spacing:-1.5px;margin:10px 0 12px;font-weight:600}
 h2{font-size:18px;font-weight:600;letter-spacing:-.4px;margin:0}
 p{margin:8px 0}
@@ -123,7 +127,7 @@ footer span{text-align:right}
   .metrics{grid-template-columns:1fr 1fr}
   .workflow-journey{grid-template-columns:1fr 1fr}
   .work-heading h2{font-size:19px}
-  header{display:block}
+  header{display:block;min-height:230px;background-position:62% center}
   header>.tag{display:inline-block;margin-top:15px}
 }
 @media(max-width:760px){
@@ -131,6 +135,7 @@ footer span{text-align:right}
   .sidebar .eyebrow,.nav,.side-note,.history-head,#history,.sidebar-bottom{display:none}
   .brand{margin:0;font-size:20px}
   main{margin:0;padding:25px 18px}
+  header{min-height:250px;padding:24px;background-position:68% center}
   h1{font-size:30px}
   .input-row{flex-direction:column}
   .work-heading{display:block}

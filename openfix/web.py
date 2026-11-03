@@ -101,9 +101,9 @@ def handler_class(root=None, port=8765):
                     if path.is_symlink():
                         raise ValueError("Symlink artifacts are not accepted")
                     return self.send(200,path.read_bytes(),"text/plain; charset=utf-8")
-                static = {"/":"index.html","/app.js":"app.js","/style.css":"style.css"}
+                static = {"/":"index.html","/app.js":"app.js","/style.css":"style.css","/assets/evidence-hero.jpg":"assets/evidence-hero.jpg"}
                 if route in static:
-                    kind = {"/":"text/html; charset=utf-8","/app.js":"application/javascript","/style.css":"text/css"}[route]
+                    kind = {"/":"text/html; charset=utf-8","/app.js":"application/javascript","/style.css":"text/css","/assets/evidence-hero.jpg":"image/jpeg"}[route]
                     return self.send(200,(ROOT/"web"/static[route]).read_bytes(),kind)
                 return self.send(404,{"error":"Not found"})
             except (ValueError, OSError, KeyError) as exc:
