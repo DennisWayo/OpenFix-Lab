@@ -31,7 +31,7 @@ Open **http://127.0.0.1:8765**. When dependencies are installed, `start.command`
 - 32 geometry fixtures: 16 bounding-box cases and 16 binary-mask cases.
 - 500 seeded no-crowd checks: baseline and candidate remain identical.
 - Ordinary matching, genuine background errors, false negatives, and image classification are preserved under the provisional localization policy.
-- 25 application tests cover fixtures, patch scope, evidence tampering, model response handling and reasoning budgets, subprocess limits, in-memory HTTP routes, origin checks, trusted HTTPS proxying, Mac loopback startup, and blocked verification.
+- 26 application tests cover fixtures, patch scope and hunk normalization, evidence tampering, model response handling and reasoning budgets, subprocess limits, in-memory HTTP routes, origin checks, trusted HTTPS proxying, Mac loopback startup, and blocked verification.
 - The `export` command produces an interactive report from a recorded run. An exported fixture report is not a live Meta session.
 
 ## Execution and scope

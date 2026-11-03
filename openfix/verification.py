@@ -2,11 +2,54 @@
 import ast
 import json
 from pathlib import Path
+import re
 import tempfile
 
 from .case_sam3 import ROOT, SOURCE
 from .evidence import digest
 from .runner import capture, docker_run
+
+
+HUNK_HEADER = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@(.*)$")
+
+
+def normalize_hunk_counts(diff):
+    """Repair only malformed unified-diff hunk counts; preserve code and paths."""
+    lines = diff.splitlines()
+    normalized = []
+    hunks = 0
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        if not line.startswith("@@"):
+            normalized.append(line)
+            index += 1
+            continue
+        match = HUNK_HEADER.match(line)
+        if not match:
+            raise ValueError("Malformed unified diff hunk header")
+        end = index + 1
+        old_count = new_count = 0
+        while end < len(lines) and not lines[end].startswith("@@"):
+            body = lines[end]
+            if body.startswith(("--- ", "+++ ", "diff --git ")):
+                break
+            if not body or body[0] not in " +-\\":
+                raise ValueError("Malformed unified diff hunk body")
+            if body[0] in " -":
+                old_count += 1
+            if body[0] in " +":
+                new_count += 1
+            end += 1
+        old_start, new_start, suffix = match.group(1), match.group(3), match.group(5)
+        normalized.append(f"@@ -{old_start},{old_count} +{new_start},{new_count} @@{suffix}")
+        normalized.extend(lines[index + 1:end])
+        hunks += 1
+        index = end
+    if not hunks:
+        raise ValueError("Expected at least one unified diff hunk")
+    result = "\n".join(normalized)
+    return result + ("\n" if diff.endswith("\n") else "")
 
 
 def stage_patch(diff, original):
@@ -25,6 +68,7 @@ def stage_patch(diff, original):
         raise ValueError("Patch must modify exactly sam3/eval/cgf1_eval.py")
     if any(line.startswith(("old mode ","new mode ","new file mode ","deleted file mode ")) for line in diff.splitlines()):
         raise ValueError("File mode changes are not accepted")
+    diff = normalize_hunk_counts(diff)
     with tempfile.TemporaryDirectory(prefix="openfix-patch-") as tmp:
         root=Path(tmp)
         source=root/"sam3/eval/cgf1_eval.py"
@@ -71,10 +115,12 @@ def verify_proposal(store, proposal_id, image="openfix-runner:local"):
     if proposal.get("revision")!=REVISION:
         raise ValueError("The proposal revision does not match the pinned verifier")
     diff=proposal["proposal"].get("unified_diff")
+    applied_diff=normalize_hunk_counts(diff)
     candidate=stage_patch(diff,original)
     record={"kind":"model_verification","parent_evidence_id":proposal_id,"issue_url":proposal["issue_url"],
             "revision":proposal["revision"],"candidate_sha256":digest(candidate.encode()),
-            "verification_scope":"SAM 3 evaluateImg methods and tiny geometry; provisional crowd policy"}
+            "verification_scope":"SAM 3 evaluateImg methods and tiny geometry; provisional crowd policy",
+            "patch_hunk_counts_normalized":applied_diff!=diff}
     head=capture(["git","rev-parse","HEAD"],cwd=ROOT,timeout=5,max_bytes=2000)
     if head["exit_code"]!=0:
         raise ValueError("The OpenFix runner must be committed in git before Docker verification")
@@ -83,7 +129,10 @@ def verify_proposal(store, proposal_id, image="openfix-runner:local"):
                              overlays={"candidate/source.py":candidate})
     except RuntimeError as exc:
         record.update({"status":"verification_blocked","reason":str(exc),"execution":[]})
-        return store.create(record,{"model-proposal.patch":diff,"candidate.py":candidate})
+        files={"model-proposal.patch":diff,"candidate.py":candidate}
+        if applied_diff!=diff:
+            files["applied-proposal.patch"]=applied_diff
+        return store.create(record,files)
     record["execution"]={k:v for k,v in execution.items() if k!="stdout"}
     record["status"]="verification_failed"
     if execution["exit_code"]==0 and execution["termination"]=="exited":
@@ -94,4 +143,7 @@ def verify_proposal(store, proposal_id, image="openfix-runner:local"):
                 record["status"]="conditional_local_pass"
         except (ValueError,KeyError,TypeError):
             record["reason"]="Container output was not a valid fixture result"
-    return store.create(record,{"model-proposal.patch":diff,"candidate.py":candidate,"container-stdout.txt":execution["stdout"]})
+    files={"model-proposal.patch":diff,"candidate.py":candidate,"container-stdout.txt":execution["stdout"]}
+    if applied_diff!=diff:
+        files["applied-proposal.patch"]=applied_diff
+    return store.create(record,files)

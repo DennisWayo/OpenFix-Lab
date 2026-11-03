@@ -3,6 +3,7 @@ from email.message import Message
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
@@ -125,6 +126,11 @@ class CaseTests(unittest.TestCase):
     def test_reviewed_patch_applies_without_execution(self):
         record,files=run_demo()
         self.assertEqual(stage_patch(files['candidate.patch'],files['source.py']),files['candidate.py'])
+
+    def test_incorrect_model_hunk_counts_are_safely_normalized(self):
+        _,files=run_demo()
+        broken=re.sub(r'(@@ -\d+),\d+ (\+\d+),\d+',r'\1,1 \2,1',files['candidate.patch'])
+        self.assertEqual(stage_patch(broken,files['source.py']),files['candidate.py'])
 
     def test_patch_for_another_path_is_rejected(self):
         with self.assertRaises(ValueError): stage_patch('--- a/private\n+++ b/private\n@@ -1 +1 @@\n-x\n+y\n','x\n')

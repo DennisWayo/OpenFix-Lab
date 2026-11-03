@@ -1,7 +1,7 @@
 # Local validation — November 3, 2026, Malaysia time
 
 - Reviewed demo: conditional local pass, 32/32 geometry fixtures and 500/500 no-crowd checks.
-- Application suite: 25 tests pass.
+- Application suite: 26 tests pass.
 - Python compilation and JavaScript syntax: pass.
 - Evidence record and source/candidate/diff artifact hashes: pass.
 - Loopback server startup and rendered browser inspection on Mac Studio: pass.
