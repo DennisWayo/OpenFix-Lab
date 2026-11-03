@@ -30,7 +30,7 @@ Open **http://127.0.0.1:8765**. When dependencies are installed, `start.command`
 - 32 geometry fixtures: 16 bounding-box cases and 16 binary-mask cases.
 - 500 seeded no-crowd checks: baseline and candidate remain identical.
 - Ordinary matching, genuine background errors, false negatives, and image classification are preserved under the provisional localization policy.
-- 22 application tests cover fixtures, patch scope, evidence tampering, model response handling, subprocess limits, in-memory HTTP routes, origin checks, and blocked verification.
+- 23 application tests cover fixtures, patch scope, evidence tampering, model response handling, subprocess limits, in-memory HTTP routes, origin checks, Mac loopback startup, and blocked verification.
 - `OpenFix-Demo.html` is an interactive export of a real fixture run. It is not a live Meta session.
 
 ## Execution and scope

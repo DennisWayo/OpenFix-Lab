@@ -1,7 +1,7 @@
 {
   "commit": "0660f5363b685db2da1c22a3181750e960beb800",
   "sample_run": "20261102T165002-cb33a06859",
-  "application_tests_passed": 22,
+  "application_tests_passed": 23,
   "geometry_fixtures_passed": 32,
   "no_crowd_checks_passed": 500,
   "live_meta_request": false,
