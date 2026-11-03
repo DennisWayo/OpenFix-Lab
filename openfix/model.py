@@ -58,8 +58,14 @@ def request_model(record, source, *, action="diagnose", api_key=None, execution=
     if action == "repair":
         instruction += "The unified_diff must modify only sam3/eval/cgf1_eval.py; keep ordinary matching and image classification unchanged. No markdown fences around the diff. "
     context = {"investigation":record,"source":{"path":"sam3/eval/cgf1_eval.py","content":source},"execution_evidence":execution}
+    # Muse Spark's private reasoning counts against the completion budget. Repair
+    # calls need enough room for both that reasoning and the visible JSON/diff.
+    reasoning_effort = "medium" if action == "repair" else "low"
+    completion_budget = 16384 if action == "repair" else 8192
     payload = {"model":config["model"],"messages":[{"role":"developer","content":instruction},
-                  {"role":"user","content":json.dumps(context,ensure_ascii=False)}], "max_completion_tokens":4096}
+                  {"role":"user","content":json.dumps(context,ensure_ascii=False)}],
+               "reasoning_effort":reasoning_effort,
+               "max_completion_tokens":completion_budget}
     request = Request(config["endpoint"], data=json.dumps(payload).encode(), headers={
         "Authorization":"Bearer "+key,"Content-Type":"application/json"},method="POST")
     try:
@@ -73,19 +79,23 @@ def request_model(record, source, *, action="diagnose", api_key=None, execution=
     except (URLError, TimeoutError):
         raise RuntimeError("Meta endpoint could not be reached; check network access") from None
     try:
-        content = data["choices"][0]["message"]["content"]
+        choice = data["choices"][0]
+        content = choice["message"]["content"]
     except (KeyError, IndexError, TypeError):
         raise ValueError("Meta endpoint returned an unexpected response shape") from None
-    try:
-        proposal = parse_object(content, fields)
-        validation_error = None
-    except ValueError as exc:
-        proposal, validation_error = None, str(exc)
+    if content is None and choice.get("finish_reason") == "length":
+        proposal, validation_error = None, "Model exhausted its completion budget before producing visible output"
+    else:
+        try:
+            proposal = parse_object(content, fields)
+            validation_error = None
+        except ValueError as exc:
+            proposal, validation_error = None, str(exc)
     return {"kind":"model_"+action, "status":"proposal_ready" if proposal else "invalid_model_response",
             "evidence_level":"model_hypothesis", "created_at":utcnow(), "model":config["model"],
             "request_sha256":digest(payload), "input_sha256":digest(record), "source_sha256":digest(source.encode()),
             "execution_evidence_sha256":digest(execution) if execution else None,
             "proposal":proposal,"raw_response":content, "validation_error":validation_error,
             "request":payload,"returned_model":data.get("model"),
-            "finish_reason":data["choices"][0].get("finish_reason"),
+            "finish_reason":choice.get("finish_reason"),
             "usage":data.get("usage"), "execution":[]}

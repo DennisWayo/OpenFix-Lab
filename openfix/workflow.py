@@ -25,6 +25,11 @@ def investigate(store, api_key=None, image="openfix-runner:local"):
         if action=="repair" and result.get("proposal") and isinstance(result["proposal"].get("unified_diff"),str):
             files["model-proposal.patch"]=result["proposal"]["unified_diff"]
         return store.create(result,files)
+    def compact(record):
+        """Keep model context useful without nesting saved prompts and raw fixture output."""
+        keys=("kind","status","reason","error","fixture_count","passed_fixtures",
+              "no_crowd_invariants","proposal","validation_error","limitations")
+        return {key:record[key] for key in keys if record.get(key) is not None}
     status="workflow_failed"
     error=None
     try:
@@ -34,7 +39,8 @@ def investigate(store, api_key=None, image="openfix-runner:local"):
         diagnosis=stage("meta_diagnosis",model_step("diagnose",seed["record"],seed["id"]))
         if not diagnosis["record"].get("proposal"):
             raise ValueError("Meta diagnosis was not valid structured output")
-        evidence={"reproduction":seed["record"],"diagnosis":diagnosis["record"]}
+        evidence={"reproduction":compact(seed["record"]),"diagnosis":compact(diagnosis["record"]),
+                  "candidate_policy":investigation["candidate_policy"]}
         for attempt in (1,2):
             repair=stage(f"meta_repair_{attempt}",model_step("repair",evidence,stages[-1]["evidence_id"]))
             if not repair["record"].get("proposal"):
@@ -49,10 +55,13 @@ def investigate(store, api_key=None, image="openfix-runner:local"):
             if verdict in ("conditional_local_pass","verification_blocked"):
                 status=verdict
                 break
-            evidence={"reproduction":seed["record"],"diagnosis":diagnosis["record"],
-                      "previous_repair":repair["record"],"verification":verification["record"]}
+            evidence={"reproduction":compact(seed["record"]),"diagnosis":compact(diagnosis["record"]),
+                      "previous_repair":compact(repair["record"]),"verification":compact(verification["record"]),
+                      "candidate_policy":investigation["candidate_policy"]}
             status="candidate_failed"
-        review=stage("meta_challenge",model_step("review",{"proposed_repair":repair["record"],"verification":verification["record"]},verification["id"]))
+        review=stage("meta_challenge",model_step("review",{"proposed_repair":compact(repair["record"]),
+                                                            "verification":compact(verification["record"]),
+                                                            "candidate_policy":investigation["candidate_policy"]},verification["id"]))
         if not review["record"].get("proposal"):
             status="review_incomplete"
     except (ValueError,RuntimeError,OSError,KeyError) as exc:

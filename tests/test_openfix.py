@@ -93,6 +93,8 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(request.headers["Authorization"],"Bearer test-secret")
         payload=json.loads(request.data)
         self.assertEqual(payload["messages"][0]["role"],"developer")
+        self.assertEqual(payload["reasoning_effort"],"low")
+        self.assertEqual(payload["max_completion_tokens"],8192)
         self.assertEqual(result["evidence_level"],"model_hypothesis")
         self.assertEqual(result["execution"],[])
         self.assertNotIn("test-secret",json.dumps(result))
@@ -105,6 +107,18 @@ class ModelTests(unittest.TestCase):
         with self.assertRaises(ValueError): parse_object("I ran all tests!",["findings"])
         with self.assertRaises(ValueError): parse_object('{}',["findings"])
         self.assertEqual(parse_object('```json\n{"findings": []}\n```',["findings"]),{"findings":[]})
+
+    @patch.dict(os.environ,{"META_API_KEY":"test-secret"},clear=True)
+    @patch("openfix.model.build_opener")
+    def test_repair_has_reasoning_headroom(self,opener):
+        response=io.BytesIO(json.dumps({"choices":[{"message":{"content":None},"finish_reason":"length"}],
+                                       "usage":{"completion_tokens":16384}}).encode())
+        opener.return_value.open.return_value=response
+        result=request_model({},"source",action="repair")
+        payload=json.loads(opener.return_value.open.call_args.args[0].data)
+        self.assertEqual(payload["reasoning_effort"],"medium")
+        self.assertEqual(payload["max_completion_tokens"],16384)
+        self.assertIn("completion budget",result["validation_error"])
 
 
 class CaseTests(unittest.TestCase):
